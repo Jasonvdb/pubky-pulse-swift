@@ -32,27 +32,27 @@ public struct PulseFeedbackStrings: Sendable {
     public var noContactAddDetails: LocalizedStringResource
 
     public init(
-        header: LocalizedStringResource = .init("owl.feedback.header", defaultValue: "How can we improve?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        footer: LocalizedStringResource = .init("owl.feedback.footer", defaultValue: "We read every piece of feedback.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        messagePlaceholder: LocalizedStringResource = .init("owl.feedback.message.placeholder", defaultValue: "Tell us what's on your mind…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        contactSectionTitle: LocalizedStringResource = .init("owl.feedback.contact.section", defaultValue: "Contact (optional)", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        contactSectionFooter: LocalizedStringResource = .init("owl.feedback.contact.footer", defaultValue: "Leave these blank and we'll still get your feedback.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        namePlaceholder: LocalizedStringResource = .init("owl.feedback.name.placeholder", defaultValue: "Your name", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        emailPlaceholder: LocalizedStringResource = .init("owl.feedback.email.placeholder", defaultValue: "you@example.com", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        submitButton: LocalizedStringResource = .init("owl.feedback.submit", defaultValue: "Send feedback", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        submittingButton: LocalizedStringResource = .init("owl.feedback.submitting", defaultValue: "Sending…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        cancelButton: LocalizedStringResource = .init("owl.feedback.cancel", defaultValue: "Cancel", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        successTitle: LocalizedStringResource = .init("owl.feedback.success.title", defaultValue: "Thanks!", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        successBody: LocalizedStringResource = .init("owl.feedback.success.body", defaultValue: "Your feedback made it through.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        errorTitle: LocalizedStringResource = .init("owl.feedback.error.title", defaultValue: "Couldn't send feedback", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        errorBlankMessage: LocalizedStringResource = .init("owl.feedback.error.blank", defaultValue: "Please write a message first.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        errorInvalidEmail: LocalizedStringResource = .init("owl.feedback.error.email", defaultValue: "That doesn't look like a valid email.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        errorIncompleteContact: LocalizedStringResource = .init("owl.feedback.error.incomplete_contact", defaultValue: "Please provide both name and email or leave both empty.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        errorGeneric: LocalizedStringResource = .init("owl.feedback.error.generic", defaultValue: "Something went wrong. Please try again.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        noContactAlertTitle: LocalizedStringResource = .init("owl.feedback.no_contact.title", defaultValue: "No contact details", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        noContactAlertMessage: LocalizedStringResource = .init("owl.feedback.no_contact.message", defaultValue: "Without your contact details, we won't be able to follow up on your feedback. Are you sure you want to continue?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        noContactSubmitAnyway: LocalizedStringResource = .init("owl.feedback.no_contact.submit", defaultValue: "Submit anyway", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
-        noContactAddDetails: LocalizedStringResource = .init("owl.feedback.no_contact.add", defaultValue: "Add contact details", bundle: .atURL(PubkyPulseBundle.resources.bundleURL))
+        header: LocalizedStringResource = .init("pulse.feedback.header", defaultValue: "How can we improve?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        footer: LocalizedStringResource = .init("pulse.feedback.footer", defaultValue: "We read every piece of feedback.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        messagePlaceholder: LocalizedStringResource = .init("pulse.feedback.message.placeholder", defaultValue: "Tell us what's on your mind…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        contactSectionTitle: LocalizedStringResource = .init("pulse.feedback.contact.section", defaultValue: "Contact (optional)", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        contactSectionFooter: LocalizedStringResource = .init("pulse.feedback.contact.footer", defaultValue: "Leave these blank and we'll still get your feedback.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        namePlaceholder: LocalizedStringResource = .init("pulse.feedback.name.placeholder", defaultValue: "Your name", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        emailPlaceholder: LocalizedStringResource = .init("pulse.feedback.email.placeholder", defaultValue: "you@example.com", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        submitButton: LocalizedStringResource = .init("pulse.feedback.submit", defaultValue: "Send feedback", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        submittingButton: LocalizedStringResource = .init("pulse.feedback.submitting", defaultValue: "Sending…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        cancelButton: LocalizedStringResource = .init("pulse.feedback.cancel", defaultValue: "Cancel", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        successTitle: LocalizedStringResource = .init("pulse.feedback.success.title", defaultValue: "Thanks!", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        successBody: LocalizedStringResource = .init("pulse.feedback.success.body", defaultValue: "Your feedback made it through.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorTitle: LocalizedStringResource = .init("pulse.feedback.error.title", defaultValue: "Couldn't send feedback", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorBlankMessage: LocalizedStringResource = .init("pulse.feedback.error.blank", defaultValue: "Please write a message first.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorInvalidEmail: LocalizedStringResource = .init("pulse.feedback.error.email", defaultValue: "That doesn't look like a valid email.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorIncompleteContact: LocalizedStringResource = .init("pulse.feedback.error.incomplete_contact", defaultValue: "Please provide both name and email or leave both empty.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorGeneric: LocalizedStringResource = .init("pulse.feedback.error.generic", defaultValue: "Something went wrong. Please try again.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactAlertTitle: LocalizedStringResource = .init("pulse.feedback.no_contact.title", defaultValue: "No contact details", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactAlertMessage: LocalizedStringResource = .init("pulse.feedback.no_contact.message", defaultValue: "Without your contact details, we won't be able to follow up on your feedback. Are you sure you want to continue?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactSubmitAnyway: LocalizedStringResource = .init("pulse.feedback.no_contact.submit", defaultValue: "Submit anyway", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactAddDetails: LocalizedStringResource = .init("pulse.feedback.no_contact.add", defaultValue: "Add contact details", bundle: .atURL(PubkyPulseBundle.resources.bundleURL))
     ) {
         self.header = header
         self.footer = footer

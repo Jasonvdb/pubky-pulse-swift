@@ -10,9 +10,9 @@ import Foundation
 public final class PulseQuestionnaireState: @unchecked Sendable {
     public static let shared = PulseQuestionnaireState()
 
-    static let launchCountKey = "owlmetry.questionnaire.launch_count"
-    static let foregroundCountKey = "owlmetry.questionnaire.foreground_count"
-    static let firstLaunchAtKey = "owlmetry.questionnaire.first_launch_at"
+    static let launchCountKey = "pubky-pulse.questionnaire.launch_count"
+    static let foregroundCountKey = "pubky-pulse.questionnaire.foreground_count"
+    static let firstLaunchAtKey = "pubky-pulse.questionnaire.first_launch_at"
 
     private let lock = NSLock()
     private var didMarkConfigured = false

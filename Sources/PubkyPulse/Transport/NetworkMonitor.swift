@@ -12,7 +12,7 @@ final class NetworkMonitor: Sendable {
     }
 
     private let monitor: NWPathMonitor
-    private let monitorQueue = DispatchQueue(label: "owlmetry.network", qos: .utility)
+    private let monitorQueue = DispatchQueue(label: "org.pubky.pulse.network", qos: .utility)
 
     private let _status: OSAllocatedUnfairLock<NetworkStatus>
 

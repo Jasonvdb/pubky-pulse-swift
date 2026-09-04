@@ -96,7 +96,7 @@ final class LifecycleObserver: @unchecked Sendable {
         let application = UIApplication.shared
         var taskId: UIBackgroundTaskIdentifier = .invalid
 
-        taskId = application.beginBackgroundTask(withName: "owlmetry.flush") { [self] in
+        taskId = application.beginBackgroundTask(withName: "org.pubky.pulse.flush") { [self] in
             logger.warning("Background flush time expired, persisting to disk")
             Task {
                 await self.transport.persistBufferToDisk()

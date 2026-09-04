@@ -22,7 +22,7 @@ final class SetUserRaceTests: XCTestCase {
     /// Hostname our mock intercepts. Filtering by host keeps the global
     /// `URLProtocol` registration from leaking into other unit tests that
     /// happen to run in parallel and use `URLSession.shared`.
-    static let mockHost = "race-test.owlmetry.invalid"
+    static let mockHost = "race-test.pulse.invalid"
 
     override class func setUp() {
         super.setUp()
@@ -57,8 +57,8 @@ final class SetUserRaceTests: XCTestCase {
     func testClaimPostIsIssuedAfterAllPriorIngestPosts() async throws {
         try Pulse.configure(
             endpoint: "https://\(Self.mockHost)",
-            apiKey: "owl_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            bundleId: "com.owlmetry.test",
+            apiKey: "pulse_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            bundleId: "org.pubky.pulse.test",
             flushOnBackground: false,
             // Disable gzip — bodies > 512 bytes would arrive compressed,
             // breaking the JSONSerialization parse below.

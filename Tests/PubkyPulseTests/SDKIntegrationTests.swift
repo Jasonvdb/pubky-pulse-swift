@@ -9,21 +9,21 @@ import CryptoKit
 /// Run via: `pnpm test:swift-sdk` (which handles server lifecycle automatically).
 final class SDKIntegrationTests: XCTestCase {
     /// Must match the test keys in apps/server/src/__tests__/setup.ts
-    static let testEndpoint = ProcessInfo.processInfo.environment["OWLMETRY_TEST_ENDPOINT"]
+    static let testEndpoint = ProcessInfo.processInfo.environment["PULSE_TEST_ENDPOINT"]
         ?? "http://localhost:4111"
-    static let testClientKey = "owl_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    static let testAgentKey = "owl_agent_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-    static let testBundleId = "com.owlmetry.test"
+    static let testClientKey = "pulse_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    static let testAgentKey = "pulse_agent_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    static let testBundleId = "org.pubky.pulse.test"
 
     /// Runs once before any test in this class. Truncates the event-bearing
-    /// tables so re-runs against the same `owlmetry_test` DB don't accumulate
+    /// tables so re-runs against the same `pubky_pulse_test` DB don't accumulate
     /// rows that would collide with the fixed `screen_name` filters used in
     /// these tests. Tests inside a single invocation use distinct screen_names
     /// (or unique UUIDs) and don't conflict with each other.
     override class func setUp() {
         super.setUp()
-        let dbUrl = ProcessInfo.processInfo.environment["OWLMETRY_TEST_DB_URL"]
-            ?? "postgres://localhost:5432/owlmetry_test"
+        let dbUrl = ProcessInfo.processInfo.environment["PULSE_TEST_DB_URL"]
+            ?? "postgres://localhost:5432/pubky_pulse_test"
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
         task.arguments = [
@@ -980,7 +980,7 @@ final class SDKIntegrationTests: XCTestCase {
         try Pulse.configure(endpoint: Self.testEndpoint, apiKey: Self.testClientKey, bundleId: Self.testBundleId)
 
         let tempDir = FileManager.default.temporaryDirectory
-        let fileName = "owl-test-\(UUID().uuidString).txt"
+        let fileName = "pulse-test-\(UUID().uuidString).txt"
         let fileURL = tempDir.appendingPathComponent(fileName)
         let payload = Data("file-based attachment".utf8)
         try payload.write(to: fileURL)

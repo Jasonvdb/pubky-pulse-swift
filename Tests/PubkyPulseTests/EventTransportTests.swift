@@ -37,7 +37,7 @@ final class EventTransportTests: XCTestCase {
         XCTAssertNotNil(receivedBody)
         if let data = receivedBody {
             let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-            XCTAssertEqual(json?["bundle_id"] as? String, "com.owlmetry.test")
+            XCTAssertEqual(json?["bundle_id"] as? String, "org.pubky.pulse.test")
             let events = json?["events"] as? [[String: Any]]
             XCTAssertEqual(events?.count, 1)
             XCTAssertEqual(events?.first?["message"] as? String, "hello")
@@ -58,7 +58,7 @@ final class EventTransportTests: XCTestCase {
 
         XCTAssertNotNil(receivedURL)
         let items = receivedURL.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.queryItems } ?? []
-        XCTAssertEqual(items.first(where: { $0.name == "bundle_id" })?.value, "com.owlmetry.test")
+        XCTAssertEqual(items.first(where: { $0.name == "bundle_id" })?.value, "org.pubky.pulse.test")
         XCTAssertEqual(items.first(where: { $0.name == "user_id" })?.value, "user_42")
         XCTAssertNil(items.first(where: { $0.name == "force" }))
     }
@@ -95,7 +95,7 @@ final class EventTransportTests: XCTestCase {
 
         try? await Task.sleep(nanoseconds: 500_000_000)
 
-        XCTAssertEqual(receivedAuth, "Bearer owl_client_test123")
+        XCTAssertEqual(receivedAuth, "Bearer pulse_client_test123")
     }
 
     // MARK: - Helpers
@@ -107,8 +107,8 @@ final class EventTransportTests: XCTestCase {
 
         return EventTransport(
             endpoint: URL(string: "https://api.test.com")!,
-            apiKey: "owl_client_test123",
-            bundleId: "com.owlmetry.test",
+            apiKey: "pulse_client_test123",
+            bundleId: "org.pubky.pulse.test",
             compressionEnabled: true,
             offlineQueue: OfflineQueue(directory: tempDir),
             networkMonitor: NetworkMonitor(),

@@ -15,7 +15,7 @@ final class LogEventTests: XCTestCase {
             environment: .ios,
             osVersion: "17.0",
             appVersion: "2.0",
-            sdkName: "owlmetry-swift",
+            sdkName: "pubky-pulse-swift",
             sdkVersion: "0.1.0",
             buildNumber: "100",
             deviceModel: "iPhone16,1",
@@ -126,7 +126,7 @@ final class LogEventTests: XCTestCase {
             environment: .ios,
             osVersion: nil,
             appVersion: nil,
-            sdkName: "owlmetry-swift",
+            sdkName: "pubky-pulse-swift",
             sdkVersion: "1.2.3",
             buildNumber: nil,
             deviceModel: nil,
@@ -138,7 +138,7 @@ final class LogEventTests: XCTestCase {
         )
         let data = try JSONEncoder().encode(event)
         let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
-        XCTAssertEqual(json["sdk_name"] as? String, "owlmetry-swift")
+        XCTAssertEqual(json["sdk_name"] as? String, "pubky-pulse-swift")
         XCTAssertEqual(json["sdk_version"] as? String, "1.2.3")
     }
 }

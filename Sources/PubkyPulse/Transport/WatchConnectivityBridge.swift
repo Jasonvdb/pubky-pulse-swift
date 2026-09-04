@@ -13,7 +13,7 @@ final class WatchConnectivityBridge: @unchecked Sendable {
     static let shared = WatchConnectivityBridge()
 
     // Wire-contract key; bumping requires cross-version migration.
-    static let envelopeKey = "__owl_v1"
+    static let envelopeKey = "__pulse_v1"
 
     // 60 KB stays defensively under WC's practical payload ceiling.
     private static let maxChunkBytes = 60_000

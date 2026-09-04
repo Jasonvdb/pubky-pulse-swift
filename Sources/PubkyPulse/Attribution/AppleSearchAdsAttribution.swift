@@ -10,7 +10,7 @@ import AdServices
 /// Design lifted from RevenueCat's `AttributionFetcher` / `AttributionPoster`
 /// (https://github.com/RevenueCat/purchases-ios/tree/main/Sources/Attribution, MIT):
 ///   - Fetches the AdServices attribution token off the main thread.
-///   - Simulator-safe: reads `OWLMETRY_MOCK_ADSERVICES_TOKEN` env var in DEBUG
+///   - Simulator-safe: reads `PULSE_MOCK_ADSERVICES_TOKEN` env var in DEBUG
 ///     to let the iOS demo / UI tests exercise the full path.
 ///   - Optimistic persistence: marks the attempt as "captured" BEFORE the POST
 ///     so concurrent `configure()` calls don't double-post; clears on failure.
@@ -28,7 +28,7 @@ enum AppleSearchAdsAttribution {
     /// giving up. Mirrors the server-side constant `ASA_MAX_PENDING_ATTEMPTS`.
     private static let maxPendingAttempts = 5
 
-    private static let mockEnvVar = "OWLMETRY_MOCK_ADSERVICES_TOKEN"
+    private static let mockEnvVar = "PULSE_MOCK_ADSERVICES_TOKEN"
 
     // MARK: - Public entrypoint (called from Pulse.configure auto-hook and from
     // Pulse.sendAppleSearchAdsAttributionToken)

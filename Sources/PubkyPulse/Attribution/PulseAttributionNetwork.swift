@@ -19,8 +19,8 @@ enum PulseAttributionNetwork: String {
     var slug: String { self.rawValue }
 
     /// Namespace used for per-network UserDefaults state (capture flags,
-    /// retry counters). Scoped under `owlmetry.attribution.<slug>.`.
-    var userDefaultsNamespace: String { "owlmetry.attribution.\(self.rawValue)" }
+    /// retry counters). Scoped under `pubky-pulse.attribution.<slug>.`.
+    var userDefaultsNamespace: String { "pubky-pulse.attribution.\(self.rawValue)" }
 }
 
 /// Outcome of a single attribution submission call, returned by the transport

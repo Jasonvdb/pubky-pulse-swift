@@ -130,7 +130,7 @@ public extension View {
     /// the trigger's conditions hold and the user is eligible per server-side
     /// state (not already-responded, not globally-dismissed). The questionnaire
     /// must already exist on the server with the given slug — create it via
-    /// the dashboard, CLI (`owlmetry questionnaires create`), or MCP.
+    /// the dashboard or MCP (`create-questionnaire`).
     ///
     /// All `trigger` conditions are ANDed:
     /// ```swift

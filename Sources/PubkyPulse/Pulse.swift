@@ -3,7 +3,7 @@ import Foundation
 import os
 
 public enum Pulse {
-    static let logSubsystem = "com.owlmetry.sdk"
+    static let logSubsystem = "org.pubky.pulse.sdk"
     private static let logger = Logger(subsystem: logSubsystem, category: "pulse")
 
     private struct State {
@@ -866,7 +866,7 @@ public enum Pulse {
             displayMessage = message
         }
 
-        var line = "🦉  \(tag) \(displayMessage)"
+        var line = "Pubky Pulse \(tag) \(displayMessage)"
         if let attributes, !attributes.isEmpty {
             let pairs = attributes.sorted(by: { $0.key < $1.key }).map { "\($0.key)=\($0.value)" }.joined(separator: ", ")
             line += " {\(pairs)}"

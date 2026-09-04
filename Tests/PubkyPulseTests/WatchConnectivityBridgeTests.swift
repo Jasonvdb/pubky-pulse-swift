@@ -66,7 +66,7 @@ final class WatchConnectivityBridgeTests: XCTestCase {
 
     func testEnvelopeKeyIsStable() {
         // Wire contract — bumping requires cross-version migration.
-        XCTAssertEqual(WatchConnectivityBridge.envelopeKey, "__owl_v1")
+        XCTAssertEqual(WatchConnectivityBridge.envelopeKey, "__pulse_v1")
     }
 }
 

@@ -7,11 +7,11 @@ import XCTest
 /// token, and we want these tests to validate the SDK <-> server wire
 /// without external dependencies.
 final class AppleSearchAdsAttributionTests: XCTestCase {
-    static let testEndpoint = ProcessInfo.processInfo.environment["OWLMETRY_TEST_ENDPOINT"]
+    static let testEndpoint = ProcessInfo.processInfo.environment["PULSE_TEST_ENDPOINT"]
         ?? "http://localhost:4111"
-    static let testClientKey = "owl_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    static let testAgentKey = "owl_agent_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-    static let testBundleId = "com.owlmetry.test"
+    static let testClientKey = "pulse_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    static let testAgentKey = "pulse_agent_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    static let testBundleId = "org.pubky.pulse.test"
 
     override func setUp() async throws {
         await Pulse.reset()

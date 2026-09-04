@@ -10,17 +10,17 @@ final class PulseIntegrationTests: XCTestCase {
     }
 
     func testConfigurationRejectsAgentKey() {
-        XCTAssertThrowsError(try PulseConfiguration(endpoint: "https://api.test.com", apiKey: "owl_agent_abc")) { error in
-            XCTAssertTrue(error.localizedDescription.contains("owl_client_"))
+        XCTAssertThrowsError(try PulseConfiguration(endpoint: "https://api.test.com", apiKey: "pulse_agent_abc")) { error in
+            XCTAssertTrue(error.localizedDescription.contains("pulse_client_"))
         }
     }
 
     func testConfigurationRejectsInvalidEndpoint() {
-        XCTAssertThrowsError(try PulseConfiguration(endpoint: "", apiKey: "owl_client_abc"))
+        XCTAssertThrowsError(try PulseConfiguration(endpoint: "", apiKey: "pulse_client_abc"))
     }
 
     func testConfigurationAcceptsValidInput() {
-        XCTAssertNoThrow(try PulseConfiguration(endpoint: "https://api.example.com", apiKey: "owl_client_test123"))
+        XCTAssertNoThrow(try PulseConfiguration(endpoint: "https://api.example.com", apiKey: "pulse_client_test123"))
     }
 
     /// The not-configured messages are public API copy: they name the product and

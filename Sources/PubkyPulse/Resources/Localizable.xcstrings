@@ -1,7 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "owl.questionnaire.button.back" : {
+    "pulse.questionnaire.button.back" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -9,7 +9,7 @@
         }
       }
     },
-    "owl.questionnaire.button.cancel" : {
+    "pulse.questionnaire.button.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -17,7 +17,7 @@
         }
       }
     },
-    "owl.questionnaire.button.done" : {
+    "pulse.questionnaire.button.done" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -25,7 +25,7 @@
         }
       }
     },
-    "owl.questionnaire.button.next" : {
+    "pulse.questionnaire.button.next" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -33,7 +33,7 @@
         }
       }
     },
-    "owl.questionnaire.consent.accept" : {
+    "pulse.questionnaire.consent.accept" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -41,7 +41,7 @@
         }
       }
     },
-    "owl.questionnaire.consent.body" : {
+    "pulse.questionnaire.consent.body" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -49,7 +49,7 @@
         }
       }
     },
-    "owl.questionnaire.consent.later" : {
+    "pulse.questionnaire.consent.later" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -57,7 +57,7 @@
         }
       }
     },
-    "owl.questionnaire.consent.never" : {
+    "pulse.questionnaire.consent.never" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -65,7 +65,7 @@
         }
       }
     },
-    "owl.questionnaire.consent.title" : {
+    "pulse.questionnaire.consent.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -73,7 +73,7 @@
         }
       }
     },
-    "owl.questionnaire.dismiss" : {
+    "pulse.questionnaire.dismiss" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -81,7 +81,7 @@
         }
       }
     },
-    "owl.questionnaire.dismiss.cancel" : {
+    "pulse.questionnaire.dismiss.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -89,7 +89,7 @@
         }
       }
     },
-    "owl.questionnaire.dismiss.confirm.action" : {
+    "pulse.questionnaire.dismiss.confirm.action" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -97,7 +97,7 @@
         }
       }
     },
-    "owl.questionnaire.dismiss.confirm.message" : {
+    "pulse.questionnaire.dismiss.confirm.message" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -105,7 +105,7 @@
         }
       }
     },
-    "owl.questionnaire.dismiss.confirm.title" : {
+    "pulse.questionnaire.dismiss.confirm.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -113,7 +113,7 @@
         }
       }
     },
-    "owl.questionnaire.error.generic" : {
+    "pulse.questionnaire.error.generic" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -121,7 +121,7 @@
         }
       }
     },
-    "owl.questionnaire.error.required" : {
+    "pulse.questionnaire.error.required" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -129,7 +129,7 @@
         }
       }
     },
-    "owl.questionnaire.error.title" : {
+    "pulse.questionnaire.error.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -137,7 +137,7 @@
         }
       }
     },
-    "owl.questionnaire.loading" : {
+    "pulse.questionnaire.loading" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -145,7 +145,7 @@
         }
       }
     },
-    "owl.questionnaire.nps.high" : {
+    "pulse.questionnaire.nps.high" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -153,7 +153,7 @@
         }
       }
     },
-    "owl.questionnaire.nps.low" : {
+    "pulse.questionnaire.nps.low" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -161,7 +161,7 @@
         }
       }
     },
-    "owl.questionnaire.required" : {
+    "pulse.questionnaire.required" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -169,7 +169,7 @@
         }
       }
     },
-    "owl.questionnaire.skip" : {
+    "pulse.questionnaire.skip" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -177,7 +177,7 @@
         }
       }
     },
-    "owl.questionnaire.submit" : {
+    "pulse.questionnaire.submit" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -185,7 +185,7 @@
         }
       }
     },
-    "owl.questionnaire.submitting" : {
+    "pulse.questionnaire.submitting" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -193,7 +193,7 @@
         }
       }
     },
-    "owl.questionnaire.success.body" : {
+    "pulse.questionnaire.success.body" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -201,7 +201,7 @@
         }
       }
     },
-    "owl.questionnaire.success.title" : {
+    "pulse.questionnaire.success.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -209,7 +209,7 @@
         }
       }
     },
-    "owl.questionnaire.title" : {
+    "pulse.questionnaire.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -217,7 +217,7 @@
         }
       }
     },
-    "owl.feedback.cancel" : {
+    "pulse.feedback.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -228,7 +228,7 @@
         }
       }
     },
-    "owl.feedback.contact.footer" : {
+    "pulse.feedback.contact.footer" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -239,7 +239,7 @@
         }
       }
     },
-    "owl.feedback.contact.section" : {
+    "pulse.feedback.contact.section" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -250,7 +250,7 @@
         }
       }
     },
-    "owl.feedback.email.placeholder" : {
+    "pulse.feedback.email.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -261,7 +261,7 @@
         }
       }
     },
-    "owl.feedback.error.blank" : {
+    "pulse.feedback.error.blank" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -272,7 +272,7 @@
         }
       }
     },
-    "owl.feedback.error.email" : {
+    "pulse.feedback.error.email" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -283,7 +283,7 @@
         }
       }
     },
-    "owl.feedback.error.generic" : {
+    "pulse.feedback.error.generic" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -294,7 +294,7 @@
         }
       }
     },
-    "owl.feedback.error.incomplete_contact" : {
+    "pulse.feedback.error.incomplete_contact" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -305,7 +305,7 @@
         }
       }
     },
-    "owl.feedback.error.title" : {
+    "pulse.feedback.error.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -316,7 +316,7 @@
         }
       }
     },
-    "owl.feedback.footer" : {
+    "pulse.feedback.footer" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -327,7 +327,7 @@
         }
       }
     },
-    "owl.feedback.header" : {
+    "pulse.feedback.header" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -338,7 +338,7 @@
         }
       }
     },
-    "owl.feedback.message.placeholder" : {
+    "pulse.feedback.message.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -349,7 +349,7 @@
         }
       }
     },
-    "owl.feedback.no_contact.add" : {
+    "pulse.feedback.no_contact.add" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -360,7 +360,7 @@
         }
       }
     },
-    "owl.feedback.no_contact.message" : {
+    "pulse.feedback.no_contact.message" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -371,7 +371,7 @@
         }
       }
     },
-    "owl.feedback.no_contact.submit" : {
+    "pulse.feedback.no_contact.submit" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -382,7 +382,7 @@
         }
       }
     },
-    "owl.feedback.no_contact.title" : {
+    "pulse.feedback.no_contact.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -393,7 +393,7 @@
         }
       }
     },
-    "owl.feedback.name.placeholder" : {
+    "pulse.feedback.name.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -404,7 +404,7 @@
         }
       }
     },
-    "owl.feedback.submit" : {
+    "pulse.feedback.submit" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -415,7 +415,7 @@
         }
       }
     },
-    "owl.feedback.submitting" : {
+    "pulse.feedback.submitting" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -426,7 +426,7 @@
         }
       }
     },
-    "owl.feedback.success.body" : {
+    "pulse.feedback.success.body" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -437,7 +437,7 @@
         }
       }
     },
-    "owl.feedback.success.title" : {
+    "pulse.feedback.success.title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

@@ -2,13 +2,13 @@ import Foundation
 import os
 
 enum IdentityManager {
-    static let anonymousIdPrefix = "owl_anon_"
+    static let anonymousIdPrefix = "pulse_anon_"
 
     private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "identity")
 
-    private static let keychainService = "com.owlmetry.sdk"
+    private static let keychainService = "org.pubky.pulse.sdk"
     private static let keychainAnonymousIdKey = "anonymousId"
-    private static let userDefaultsUserIdKey = "owlmetry.userId"
+    private static let userDefaultsUserIdKey = "pubky-pulse.userId"
 
     // MARK: - Anonymous ID (Keychain-backed, survives reinstalls)
 

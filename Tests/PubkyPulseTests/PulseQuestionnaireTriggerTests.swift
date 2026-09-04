@@ -75,7 +75,7 @@ final class PulseQuestionnaireTriggerTests: XCTestCase {
     // MARK: - State persistence
 
     func testLaunchCounterIncrementsOnce() {
-        let defaults = UserDefaults(suiteName: "owl.test.questionnaire.\(UUID().uuidString)")!
+        let defaults = UserDefaults(suiteName: "pulse.test.questionnaire.\(UUID().uuidString)")!
         defer { defaults.removePersistentDomain(forName: defaults.dictionaryRepresentation().keys.first ?? "") }
         let state = PulseQuestionnaireState(defaults: defaults)
         state.markConfiguredOnce()
@@ -86,7 +86,7 @@ final class PulseQuestionnaireTriggerTests: XCTestCase {
     }
 
     func testForegroundIncrementsRepeatedly() {
-        let defaults = UserDefaults(suiteName: "owl.test.questionnaire.\(UUID().uuidString)")!
+        let defaults = UserDefaults(suiteName: "pulse.test.questionnaire.\(UUID().uuidString)")!
         let state = PulseQuestionnaireState(defaults: defaults)
         state.incrementForeground()
         state.incrementForeground()
@@ -95,7 +95,7 @@ final class PulseQuestionnaireTriggerTests: XCTestCase {
     }
 
     func testFirstLaunchPreservedAcrossInstances() {
-        let suite = "owl.test.questionnaire.\(UUID().uuidString)"
+        let suite = "pulse.test.questionnaire.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defer { defaults.removePersistentDomain(forName: suite) }
 

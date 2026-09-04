@@ -10,7 +10,7 @@ public struct PulseConfiguration: Sendable {
     let consoleLogging: Bool
     let attributionEnabled: Bool
 
-    private static let clientKeyPrefix = "owl_client_"
+    private static let clientKeyPrefix = "pulse_client_"
 
     public init(
         endpoint: String,
