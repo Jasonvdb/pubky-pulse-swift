@@ -1,10 +1,10 @@
 import Foundation
 
 /// User-facing strings rendered by the questionnaire flow. Same convention as
-/// `OwlFeedbackStrings` — every field is a `LocalizedStringResource` so
+/// `PulseFeedbackStrings` — every field is a `LocalizedStringResource` so
 /// defaults flow through the SDK's bundled string catalog while callers can
 /// override individual entries via `.default.with(...)`.
-public struct OwlQuestionnaireStrings: Sendable {
+public struct PulseQuestionnaireStrings: Sendable {
     // Phase: running flow (questions + nav)
     public var title: LocalizedStringResource
     public var loadingTitle: LocalizedStringResource
@@ -41,33 +41,33 @@ public struct OwlQuestionnaireStrings: Sendable {
     public var npsHighLabel: LocalizedStringResource
 
     public init(
-        title: LocalizedStringResource = .init("owl.questionnaire.title", defaultValue: "Quick survey", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        loadingTitle: LocalizedStringResource = .init("owl.questionnaire.loading", defaultValue: "Loading…", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        submitButton: LocalizedStringResource = .init("owl.questionnaire.submit", defaultValue: "Submit", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        submittingButton: LocalizedStringResource = .init("owl.questionnaire.submitting", defaultValue: "Sending…", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        skipButton: LocalizedStringResource = .init("owl.questionnaire.skip", defaultValue: "Not now", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        nextButton: LocalizedStringResource = .init("owl.questionnaire.button.next", defaultValue: "Next", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        backButton: LocalizedStringResource = .init("owl.questionnaire.button.back", defaultValue: "Back", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        doneButton: LocalizedStringResource = .init("owl.questionnaire.button.done", defaultValue: "Done", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        cancelButton: LocalizedStringResource = .init("owl.questionnaire.button.cancel", defaultValue: "Cancel", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        consentTitle: LocalizedStringResource = .init("owl.questionnaire.consent.title", defaultValue: "Quick favor?", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        consentBody: LocalizedStringResource = .init("owl.questionnaire.consent.body", defaultValue: "We'd love a few minutes of your feedback to help us improve.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        consentAccept: LocalizedStringResource = .init("owl.questionnaire.consent.accept", defaultValue: "Sure, happy to help", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        consentLater: LocalizedStringResource = .init("owl.questionnaire.consent.later", defaultValue: "Maybe later", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        consentNever: LocalizedStringResource = .init("owl.questionnaire.consent.never", defaultValue: "Don't ask again", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        doNotShowAgain: LocalizedStringResource = .init("owl.questionnaire.dismiss", defaultValue: "Don't show again", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        doNotShowAgainConfirmTitle: LocalizedStringResource = .init("owl.questionnaire.dismiss.confirm.title", defaultValue: "Don't show questionnaires?", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        doNotShowAgainConfirmMessage: LocalizedStringResource = .init("owl.questionnaire.dismiss.confirm.message", defaultValue: "We won't ask you to fill in another questionnaire.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        doNotShowAgainConfirmAction: LocalizedStringResource = .init("owl.questionnaire.dismiss.confirm.action", defaultValue: "Don't show again", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        doNotShowAgainCancel: LocalizedStringResource = .init("owl.questionnaire.dismiss.cancel", defaultValue: "Keep showing", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        requiredLabel: LocalizedStringResource = .init("owl.questionnaire.required", defaultValue: "Required", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        successTitle: LocalizedStringResource = .init("owl.questionnaire.success.title", defaultValue: "Thanks!", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        successBody: LocalizedStringResource = .init("owl.questionnaire.success.body", defaultValue: "Your answers help us improve.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorTitle: LocalizedStringResource = .init("owl.questionnaire.error.title", defaultValue: "Couldn't send response", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorRequiredMissing: LocalizedStringResource = .init("owl.questionnaire.error.required", defaultValue: "Please answer the required questions.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorGeneric: LocalizedStringResource = .init("owl.questionnaire.error.generic", defaultValue: "Something went wrong. Please try again.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        npsLowLabel: LocalizedStringResource = .init("owl.questionnaire.nps.low", defaultValue: "Not at all likely", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        npsHighLabel: LocalizedStringResource = .init("owl.questionnaire.nps.high", defaultValue: "Extremely likely", bundle: .atURL(OwlmetryBundle.resources.bundleURL))
+        title: LocalizedStringResource = .init("owl.questionnaire.title", defaultValue: "Quick survey", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        loadingTitle: LocalizedStringResource = .init("owl.questionnaire.loading", defaultValue: "Loading…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        submitButton: LocalizedStringResource = .init("owl.questionnaire.submit", defaultValue: "Submit", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        submittingButton: LocalizedStringResource = .init("owl.questionnaire.submitting", defaultValue: "Sending…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        skipButton: LocalizedStringResource = .init("owl.questionnaire.skip", defaultValue: "Not now", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        nextButton: LocalizedStringResource = .init("owl.questionnaire.button.next", defaultValue: "Next", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        backButton: LocalizedStringResource = .init("owl.questionnaire.button.back", defaultValue: "Back", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        doneButton: LocalizedStringResource = .init("owl.questionnaire.button.done", defaultValue: "Done", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        cancelButton: LocalizedStringResource = .init("owl.questionnaire.button.cancel", defaultValue: "Cancel", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        consentTitle: LocalizedStringResource = .init("owl.questionnaire.consent.title", defaultValue: "Quick favor?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        consentBody: LocalizedStringResource = .init("owl.questionnaire.consent.body", defaultValue: "We'd love a few minutes of your feedback to help us improve.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        consentAccept: LocalizedStringResource = .init("owl.questionnaire.consent.accept", defaultValue: "Sure, happy to help", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        consentLater: LocalizedStringResource = .init("owl.questionnaire.consent.later", defaultValue: "Maybe later", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        consentNever: LocalizedStringResource = .init("owl.questionnaire.consent.never", defaultValue: "Don't ask again", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        doNotShowAgain: LocalizedStringResource = .init("owl.questionnaire.dismiss", defaultValue: "Don't show again", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        doNotShowAgainConfirmTitle: LocalizedStringResource = .init("owl.questionnaire.dismiss.confirm.title", defaultValue: "Don't show questionnaires?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        doNotShowAgainConfirmMessage: LocalizedStringResource = .init("owl.questionnaire.dismiss.confirm.message", defaultValue: "We won't ask you to fill in another questionnaire.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        doNotShowAgainConfirmAction: LocalizedStringResource = .init("owl.questionnaire.dismiss.confirm.action", defaultValue: "Don't show again", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        doNotShowAgainCancel: LocalizedStringResource = .init("owl.questionnaire.dismiss.cancel", defaultValue: "Keep showing", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        requiredLabel: LocalizedStringResource = .init("owl.questionnaire.required", defaultValue: "Required", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        successTitle: LocalizedStringResource = .init("owl.questionnaire.success.title", defaultValue: "Thanks!", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        successBody: LocalizedStringResource = .init("owl.questionnaire.success.body", defaultValue: "Your answers help us improve.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorTitle: LocalizedStringResource = .init("owl.questionnaire.error.title", defaultValue: "Couldn't send response", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorRequiredMissing: LocalizedStringResource = .init("owl.questionnaire.error.required", defaultValue: "Please answer the required questions.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorGeneric: LocalizedStringResource = .init("owl.questionnaire.error.generic", defaultValue: "Something went wrong. Please try again.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        npsLowLabel: LocalizedStringResource = .init("owl.questionnaire.nps.low", defaultValue: "Not at all likely", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        npsHighLabel: LocalizedStringResource = .init("owl.questionnaire.nps.high", defaultValue: "Extremely likely", bundle: .atURL(PubkyPulseBundle.resources.bundleURL))
     ) {
         self.title = title
         self.loadingTitle = loadingTitle
@@ -98,7 +98,7 @@ public struct OwlQuestionnaireStrings: Sendable {
         self.npsHighLabel = npsHighLabel
     }
 
-    public static let `default` = OwlQuestionnaireStrings()
+    public static let `default` = PulseQuestionnaireStrings()
 
     public func with(
         title: LocalizedStringResource? = nil,
@@ -121,7 +121,7 @@ public struct OwlQuestionnaireStrings: Sendable {
         errorGeneric: LocalizedStringResource? = nil,
         npsLowLabel: LocalizedStringResource? = nil,
         npsHighLabel: LocalizedStringResource? = nil
-    ) -> OwlQuestionnaireStrings {
+    ) -> PulseQuestionnaireStrings {
         var copy = self
         if let title { copy.title = title }
         if let submitButton { copy.submitButton = submitButton }

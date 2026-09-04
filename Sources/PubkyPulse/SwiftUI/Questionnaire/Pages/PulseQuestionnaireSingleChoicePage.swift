@@ -1,8 +1,8 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-struct OwlQuestionnaireSingleChoicePage: View {
-    let question: OwlQuestionnaireSingleChoiceQuestion
+struct PulseQuestionnaireSingleChoicePage: View {
+    let question: PulseQuestionnaireSingleChoiceQuestion
     @Binding var value: String?
 
     var body: some View {
@@ -23,10 +23,10 @@ struct OwlQuestionnaireSingleChoicePage: View {
         }
     }
 
-    private func choiceRow(option: OwlQuestionnaireChoiceOption) -> some View {
+    private func choiceRow(option: PulseQuestionnaireChoiceOption) -> some View {
         let isSelected = value == option.id
         return Button {
-            OwlHaptics.tap()
+            PulseHaptics.tap()
             value = option.id
         } label: {
             HStack {

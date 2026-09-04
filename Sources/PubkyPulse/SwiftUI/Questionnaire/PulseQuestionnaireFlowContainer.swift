@@ -4,15 +4,15 @@ import SwiftUI
 /// Phase of the questionnaire flow. The container starts in `.consent` when
 /// the consumer asks for it, otherwise jumps straight to `.running(index: 0)`.
 /// Internal — not part of the SDK's public surface.
-enum OwlQuestionnairePhase: Equatable {
+enum PulseQuestionnairePhase: Equatable {
     case consent
     case running(index: Int)
-    case success(OwlQuestionnaireReceipt)
+    case success(PulseQuestionnaireReceipt)
 }
 
 /// Internal host that owns the questionnaire flow: phase machine, answer
-/// state, sheet-detent state. Used by both the public `OwlQuestionnaireView`
-/// (manual presentation) and the auto-trigger `.owlQuestionnaire(...)` view
+/// state, sheet-detent state. Used by both the public `PulseQuestionnaireView`
+/// (manual presentation) and the auto-trigger `.pulseQuestionnaire(...)` view
 /// modifier — they pass `showsConsent` differently but share this container.
 ///
 /// **Why the container owns the detent:** `.presentationDetents(...)`,
@@ -20,13 +20,13 @@ enum OwlQuestionnairePhase: Equatable {
 /// only take effect when applied **inside** the sheet's content view, so the
 /// container is the one place that can wire them. A `@State` selection binding
 /// here drives the smooth small→large animation when consent is accepted.
-struct OwlQuestionnaireFlowContainer: View {
-    let questionnaire: OwlQuestionnaire
-    let inProgress: OwlQuestionnaireDraft?
+struct PulseQuestionnaireFlowContainer: View {
+    let questionnaire: PulseQuestionnaire
+    let inProgress: PulseQuestionnaireDraft?
     let showsConsent: Bool
     let consentIcon: Image?
-    let strings: OwlQuestionnaireStrings
-    let onSubmitted: ((OwlQuestionnaireReceipt) -> Void)?
+    let strings: PulseQuestionnaireStrings
+    let onSubmitted: ((PulseQuestionnaireReceipt) -> Void)?
     let onCancel: (() -> Void)?
     let onDismissed: (() -> Void)?
 
@@ -46,17 +46,17 @@ struct OwlQuestionnaireFlowContainer: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var phase: OwlQuestionnairePhase
+    @State private var phase: PulseQuestionnairePhase
     @State private var detent: PresentationDetent
     /// Tracks the consent view's intrinsic content height so the detent can
     /// grow to fit longer titles/descriptions (or shrink for shorter ones).
     /// Updated via `ConsentContentHeightPreferenceKey` from a GeometryReader
     /// background on the consent view.
-    @State private var measuredConsentDetentHeight: CGFloat = OwlQuestionnaireFlowContainer.initialConsentDetentHeight
+    @State private var measuredConsentDetentHeight: CGFloat = PulseQuestionnaireFlowContainer.initialConsentDetentHeight
 
     // Answer state — backed by a unit-testable value-type store. Pre-filled
     // from `inProgress.answers` on init when resuming an existing draft.
-    @State private var answers: OwlQuestionnaireAnswerStore
+    @State private var answers: PulseQuestionnaireAnswerStore
 
     @State private var isSubmitting = false
     @State private var errorMessage: String?
@@ -69,12 +69,12 @@ struct OwlQuestionnaireFlowContainer: View {
     @FocusState private var focusedTextQuestionId: String?
 
     init(
-        questionnaire: OwlQuestionnaire,
-        inProgress: OwlQuestionnaireDraft? = nil,
+        questionnaire: PulseQuestionnaire,
+        inProgress: PulseQuestionnaireDraft? = nil,
         showsConsent: Bool,
         consentIcon: Image?,
-        strings: OwlQuestionnaireStrings,
-        onSubmitted: ((OwlQuestionnaireReceipt) -> Void)? = nil,
+        strings: PulseQuestionnaireStrings,
+        onSubmitted: ((PulseQuestionnaireReceipt) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onDismissed: (() -> Void)? = nil
     ) {
@@ -90,7 +90,7 @@ struct OwlQuestionnaireFlowContainer: View {
         // Hydrate the answer store from any server-side draft before SwiftUI
         // creates page bindings, so the first render already has the saved
         // values visible.
-        var hydrated = OwlQuestionnaireAnswerStore()
+        var hydrated = PulseQuestionnaireAnswerStore()
         if let inProgress {
             hydrated.prefill(from: inProgress.answers)
         }
@@ -127,10 +127,10 @@ struct OwlQuestionnaireFlowContainer: View {
                 titleVisibility: .visible
             ) {
                 Button(role: .destructive) {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     Task { await dismissGlobally() }
                 } label: { Text(strings.doNotShowAgainConfirmAction) }
-                Button(role: .cancel) { OwlHaptics.tap() } label: { Text(strings.doNotShowAgainCancel) }
+                Button(role: .cancel) { PulseHaptics.tap() } label: { Text(strings.doNotShowAgainCancel) }
             } message: {
                 Text(strings.doNotShowAgainConfirmMessage)
             }
@@ -174,7 +174,7 @@ struct OwlQuestionnaireFlowContainer: View {
     private var rootContent: some View {
         switch phase {
         case .consent:
-            OwlQuestionnaireConsentView(
+            PulseQuestionnaireConsentView(
                 icon: consentIcon,
                 title: strings.consentTitle,
                 message: consentBodyText,
@@ -199,7 +199,7 @@ struct OwlQuestionnaireFlowContainer: View {
                 }
             )
             .onAppear {
-                Owl.info("sdk:questionnaire_consent_shown", attributes: [
+                Pulse.info("sdk:questionnaire_consent_shown", attributes: [
                     "_slug": questionnaire.slug,
                 ])
             }
@@ -209,7 +209,7 @@ struct OwlQuestionnaireFlowContainer: View {
         case .running(let index):
             runningView(index: index)
         case .success(let receipt):
-            OwlQuestionnaireSuccessView(
+            PulseQuestionnaireSuccessView(
                 title: strings.successTitle,
                 message: strings.successBody,
                 doneLabel: strings.doneButton,
@@ -229,7 +229,7 @@ struct OwlQuestionnaireFlowContainer: View {
         let question = questions[current]
 
         VStack(spacing: 0) {
-            OwlQuestionnaireProgressBar(current: current, total: total)
+            PulseQuestionnaireProgressBar(current: current, total: total)
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
                 .padding(.bottom, 8)
@@ -258,7 +258,7 @@ struct OwlQuestionnaireFlowContainer: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     cancelMidFlow()
                 } label: {
                     Text(strings.cancelButton)
@@ -296,31 +296,31 @@ struct OwlQuestionnaireFlowContainer: View {
     }
 
     @ViewBuilder
-    private func pageView(for question: OwlQuestionnaireQuestion) -> some View {
+    private func pageView(for question: PulseQuestionnaireQuestion) -> some View {
         switch question {
         case .text(let q):
-            OwlQuestionnaireTextPage(
+            PulseQuestionnaireTextPage(
                 question: q,
                 value: bindingForText(q.id),
                 focused: $focusedTextQuestionId
             )
         case .singleChoice(let q):
-            OwlQuestionnaireSingleChoicePage(
+            PulseQuestionnaireSingleChoicePage(
                 question: q,
                 value: bindingForSingle(q.id)
             )
         case .multiChoice(let q):
-            OwlQuestionnaireMultiChoicePage(
+            PulseQuestionnaireMultiChoicePage(
                 question: q,
                 value: bindingForMulti(q.id)
             )
         case .rating(let q):
-            OwlQuestionnaireRatingPage(
+            PulseQuestionnaireRatingPage(
                 question: q,
                 value: bindingForRating(q.id)
             )
         case .nps(let q):
-            OwlQuestionnaireNpsPage(
+            PulseQuestionnaireNpsPage(
                 question: q,
                 value: bindingForNps(q.id),
                 lowLabel: strings.npsLowLabel,
@@ -330,14 +330,14 @@ struct OwlQuestionnaireFlowContainer: View {
     }
 
     @ViewBuilder
-    private func buttonBar(index: Int, total: Int, question: OwlQuestionnaireQuestion) -> some View {
+    private func buttonBar(index: Int, total: Int, question: PulseQuestionnaireQuestion) -> some View {
         let isLast = index == total - 1
         let canAdvance = !question.required || isAnswered(question)
 
         HStack(spacing: 12) {
             if index > 0 {
                 Button {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     goBack(from: index)
                 } label: {
                     Text(strings.backButton)
@@ -352,7 +352,7 @@ struct OwlQuestionnaireFlowContainer: View {
             }
 
             Button {
-                OwlHaptics.tap()
+                PulseHaptics.tap()
                 if isLast {
                     Task { await submit() }
                 } else {
@@ -386,7 +386,7 @@ struct OwlQuestionnaireFlowContainer: View {
     // MARK: - Phase transitions
 
     private func acceptConsent() {
-        Owl.info("sdk:questionnaire_started", attributes: [
+        Pulse.info("sdk:questionnaire_started", attributes: [
             "_slug": questionnaire.slug,
         ])
         withAnimation(.easeInOut(duration: 0.3)) {
@@ -396,7 +396,7 @@ struct OwlQuestionnaireFlowContainer: View {
     }
 
     private func declineLater() {
-        Owl.debug("sdk:questionnaire_consent_dismissed", attributes: [
+        Pulse.debug("sdk:questionnaire_consent_dismissed", attributes: [
             "_slug": questionnaire.slug,
             "_reason": "later",
         ])
@@ -427,7 +427,7 @@ struct OwlQuestionnaireFlowContainer: View {
         dismiss()
     }
 
-    private func finishSuccess(receipt: OwlQuestionnaireReceipt) {
+    private func finishSuccess(receipt: PulseQuestionnaireReceipt) {
         focusedTextQuestionId = nil
         onSubmitted?(receipt)
         dismiss()
@@ -450,18 +450,18 @@ struct OwlQuestionnaireFlowContainer: View {
         isSubmitting = true
         defer { isSubmitting = false }
         do {
-            let receipt = try await Owl.saveQuestionnaireResponse(
+            let receipt = try await Pulse.saveQuestionnaireResponse(
                 slug: questionnaire.slug,
                 answers: collectAnswers(),
                 isComplete: true
             )
-            Owl.info("sdk:questionnaire_submitted", attributes: [
+            Pulse.info("sdk:questionnaire_submitted", attributes: [
                 "_slug": questionnaire.slug,
             ])
             withAnimation(.easeInOut(duration: 0.3)) {
                 phase = .success(receipt)
             }
-        } catch let err as OwlQuestionnaireError {
+        } catch let err as PulseQuestionnaireError {
             errorMessage = err.errorDescription
         } catch {
             errorMessage = error.localizedDescription
@@ -479,7 +479,7 @@ struct OwlQuestionnaireFlowContainer: View {
         // payload would just hit the server for no reason.
         guard !payload.isEmpty else { return }
         do {
-            _ = try await Owl.saveQuestionnaireResponse(
+            _ = try await Pulse.saveQuestionnaireResponse(
                 slug: questionnaire.slug,
                 answers: payload,
                 isComplete: false
@@ -494,15 +494,15 @@ struct OwlQuestionnaireFlowContainer: View {
         isSubmitting = true
         defer { isSubmitting = false }
         do {
-            _ = try await Owl.dismissQuestionnaires()
-            Owl.debug("sdk:questionnaire_consent_dismissed", attributes: [
+            _ = try await Pulse.dismissQuestionnaires()
+            Pulse.debug("sdk:questionnaire_consent_dismissed", attributes: [
                 "_slug": questionnaire.slug,
                 "_reason": "never",
             ])
             focusedTextQuestionId = nil
             onDismissed?()
             dismiss()
-        } catch let err as OwlQuestionnaireError {
+        } catch let err as PulseQuestionnaireError {
             errorMessage = err.errorDescription
         } catch {
             errorMessage = error.localizedDescription
@@ -542,7 +542,7 @@ struct OwlQuestionnaireFlowContainer: View {
         Binding(get: { answers.nps[id] }, set: { answers.nps[id] = $0 })
     }
 
-    private func isAnswered(_ question: OwlQuestionnaireQuestion) -> Bool {
+    private func isAnswered(_ question: PulseQuestionnaireQuestion) -> Bool {
         answers.isAnswered(question)
     }
 
@@ -550,7 +550,7 @@ struct OwlQuestionnaireFlowContainer: View {
         answers.hasAllRequired(questionnaire.schema)
     }
 
-    private func collectAnswers() -> [String: OwlQuestionnaireAnswerValue] {
+    private func collectAnswers() -> [String: PulseQuestionnaireAnswerValue] {
         answers.collected(questionnaire.schema)
     }
 }

@@ -1,14 +1,14 @@
 import Foundation
 
-/// All user-facing strings rendered by `OwlFeedbackView`. Every field is a
+/// All user-facing strings rendered by `PulseFeedbackView`. Every field is a
 /// `LocalizedStringResource` (iOS 16+) so defaults ship localized via the
 /// SDK's bundled string catalog while callers can also:
 ///
-/// - Pass plain string literals (`OwlFeedbackStrings(header: "How can we help?", .default)`).
+/// - Pass plain string literals (`PulseFeedbackStrings(header: "How can we help?", .default)`).
 /// - Resolve against their own catalog
-///   (`OwlFeedbackStrings(header: LocalizedStringResource("feedback.header", table: "MyApp"))`).
+///   (`PulseFeedbackStrings(header: LocalizedStringResource("feedback.header", table: "MyApp"))`).
 /// - Override a single field via `.default.with(header: "…")`.
-public struct OwlFeedbackStrings: Sendable {
+public struct PulseFeedbackStrings: Sendable {
     public var header: LocalizedStringResource
     public var footer: LocalizedStringResource
     public var messagePlaceholder: LocalizedStringResource
@@ -32,27 +32,27 @@ public struct OwlFeedbackStrings: Sendable {
     public var noContactAddDetails: LocalizedStringResource
 
     public init(
-        header: LocalizedStringResource = .init("owl.feedback.header", defaultValue: "How can we improve?", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        footer: LocalizedStringResource = .init("owl.feedback.footer", defaultValue: "We read every piece of feedback.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        messagePlaceholder: LocalizedStringResource = .init("owl.feedback.message.placeholder", defaultValue: "Tell us what's on your mind…", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        contactSectionTitle: LocalizedStringResource = .init("owl.feedback.contact.section", defaultValue: "Contact (optional)", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        contactSectionFooter: LocalizedStringResource = .init("owl.feedback.contact.footer", defaultValue: "Leave these blank and we'll still get your feedback.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        namePlaceholder: LocalizedStringResource = .init("owl.feedback.name.placeholder", defaultValue: "Your name", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        emailPlaceholder: LocalizedStringResource = .init("owl.feedback.email.placeholder", defaultValue: "you@example.com", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        submitButton: LocalizedStringResource = .init("owl.feedback.submit", defaultValue: "Send feedback", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        submittingButton: LocalizedStringResource = .init("owl.feedback.submitting", defaultValue: "Sending…", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        cancelButton: LocalizedStringResource = .init("owl.feedback.cancel", defaultValue: "Cancel", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        successTitle: LocalizedStringResource = .init("owl.feedback.success.title", defaultValue: "Thanks!", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        successBody: LocalizedStringResource = .init("owl.feedback.success.body", defaultValue: "Your feedback made it through.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorTitle: LocalizedStringResource = .init("owl.feedback.error.title", defaultValue: "Couldn't send feedback", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorBlankMessage: LocalizedStringResource = .init("owl.feedback.error.blank", defaultValue: "Please write a message first.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorInvalidEmail: LocalizedStringResource = .init("owl.feedback.error.email", defaultValue: "That doesn't look like a valid email.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorIncompleteContact: LocalizedStringResource = .init("owl.feedback.error.incomplete_contact", defaultValue: "Please provide both name and email or leave both empty.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        errorGeneric: LocalizedStringResource = .init("owl.feedback.error.generic", defaultValue: "Something went wrong. Please try again.", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        noContactAlertTitle: LocalizedStringResource = .init("owl.feedback.no_contact.title", defaultValue: "No contact details", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        noContactAlertMessage: LocalizedStringResource = .init("owl.feedback.no_contact.message", defaultValue: "Without your contact details, we won't be able to follow up on your feedback. Are you sure you want to continue?", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        noContactSubmitAnyway: LocalizedStringResource = .init("owl.feedback.no_contact.submit", defaultValue: "Submit anyway", bundle: .atURL(OwlmetryBundle.resources.bundleURL)),
-        noContactAddDetails: LocalizedStringResource = .init("owl.feedback.no_contact.add", defaultValue: "Add contact details", bundle: .atURL(OwlmetryBundle.resources.bundleURL))
+        header: LocalizedStringResource = .init("owl.feedback.header", defaultValue: "How can we improve?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        footer: LocalizedStringResource = .init("owl.feedback.footer", defaultValue: "We read every piece of feedback.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        messagePlaceholder: LocalizedStringResource = .init("owl.feedback.message.placeholder", defaultValue: "Tell us what's on your mind…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        contactSectionTitle: LocalizedStringResource = .init("owl.feedback.contact.section", defaultValue: "Contact (optional)", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        contactSectionFooter: LocalizedStringResource = .init("owl.feedback.contact.footer", defaultValue: "Leave these blank and we'll still get your feedback.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        namePlaceholder: LocalizedStringResource = .init("owl.feedback.name.placeholder", defaultValue: "Your name", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        emailPlaceholder: LocalizedStringResource = .init("owl.feedback.email.placeholder", defaultValue: "you@example.com", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        submitButton: LocalizedStringResource = .init("owl.feedback.submit", defaultValue: "Send feedback", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        submittingButton: LocalizedStringResource = .init("owl.feedback.submitting", defaultValue: "Sending…", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        cancelButton: LocalizedStringResource = .init("owl.feedback.cancel", defaultValue: "Cancel", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        successTitle: LocalizedStringResource = .init("owl.feedback.success.title", defaultValue: "Thanks!", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        successBody: LocalizedStringResource = .init("owl.feedback.success.body", defaultValue: "Your feedback made it through.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorTitle: LocalizedStringResource = .init("owl.feedback.error.title", defaultValue: "Couldn't send feedback", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorBlankMessage: LocalizedStringResource = .init("owl.feedback.error.blank", defaultValue: "Please write a message first.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorInvalidEmail: LocalizedStringResource = .init("owl.feedback.error.email", defaultValue: "That doesn't look like a valid email.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorIncompleteContact: LocalizedStringResource = .init("owl.feedback.error.incomplete_contact", defaultValue: "Please provide both name and email or leave both empty.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        errorGeneric: LocalizedStringResource = .init("owl.feedback.error.generic", defaultValue: "Something went wrong. Please try again.", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactAlertTitle: LocalizedStringResource = .init("owl.feedback.no_contact.title", defaultValue: "No contact details", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactAlertMessage: LocalizedStringResource = .init("owl.feedback.no_contact.message", defaultValue: "Without your contact details, we won't be able to follow up on your feedback. Are you sure you want to continue?", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactSubmitAnyway: LocalizedStringResource = .init("owl.feedback.no_contact.submit", defaultValue: "Submit anyway", bundle: .atURL(PubkyPulseBundle.resources.bundleURL)),
+        noContactAddDetails: LocalizedStringResource = .init("owl.feedback.no_contact.add", defaultValue: "Add contact details", bundle: .atURL(PubkyPulseBundle.resources.bundleURL))
     ) {
         self.header = header
         self.footer = footer
@@ -77,7 +77,7 @@ public struct OwlFeedbackStrings: Sendable {
         self.noContactAddDetails = noContactAddDetails
     }
 
-    public static let `default` = OwlFeedbackStrings()
+    public static let `default` = PulseFeedbackStrings()
 
     /// Return a copy with the passed-in fields overridden (`.default.with(header: "Hi!")`).
     public func with(
@@ -102,7 +102,7 @@ public struct OwlFeedbackStrings: Sendable {
         noContactAlertMessage: LocalizedStringResource? = nil,
         noContactSubmitAnyway: LocalizedStringResource? = nil,
         noContactAddDetails: LocalizedStringResource? = nil
-    ) -> OwlFeedbackStrings {
+    ) -> PulseFeedbackStrings {
         var copy = self
         if let header { copy.header = header }
         if let footer { copy.footer = footer }

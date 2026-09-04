@@ -112,7 +112,7 @@ final class ErrorExtractionTests: XCTestCase {
             callStack: []
         )
         // `String(reflecting: type(of:))` in tests produces something like
-        // "OwlmetryTests.PlainError" — confirm the module prefix is present.
+        // "PubkyPulseTests.PlainError" — confirm the module prefix is present.
         XCTAssertTrue(result.attributes["_error_type"]?.contains(".") == true,
                       "expected module-qualified type, got \(result.attributes["_error_type"] ?? "nil")")
     }

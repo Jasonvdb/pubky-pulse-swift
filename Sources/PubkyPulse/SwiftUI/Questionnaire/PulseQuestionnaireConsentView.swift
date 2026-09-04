@@ -1,13 +1,13 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-/// Small-detent content rendered for `OwlQuestionnairePhase.consent`. An
+/// Small-detent content rendered for `PulseQuestionnairePhase.consent`. An
 /// optional hero icon sits above the large title + body. The primary CTA
 /// is the only filled button; "Maybe later" and "Don't ask again" sit
 /// below as plain links with generous tap targets so the visual weight
 /// tracks user preference without making the secondary actions too small
 /// to hit.
-struct OwlQuestionnaireConsentView: View {
+struct PulseQuestionnaireConsentView: View {
     let icon: Image?
     let title: LocalizedStringResource
     let message: String
@@ -47,7 +47,7 @@ struct OwlQuestionnaireConsentView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Button {
-                OwlHaptics.tap()
+                PulseHaptics.tap()
                 onAccept()
             } label: {
                 Text(acceptLabel)
@@ -59,7 +59,7 @@ struct OwlQuestionnaireConsentView: View {
 
             VStack(spacing: 4) {
                 Button {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     onLater()
                 } label: {
                     Text(laterLabel)
@@ -71,7 +71,7 @@ struct OwlQuestionnaireConsentView: View {
                 .buttonStyle(.plain)
 
                 Button(role: .destructive) {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     onNever()
                 } label: {
                     Text(neverLabel)

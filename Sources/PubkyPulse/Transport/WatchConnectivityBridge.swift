@@ -4,7 +4,7 @@ import os
 #if canImport(WatchConnectivity)
 import WatchConnectivity
 
-/// Relays Owlmetry events from a watchOS app to its paired iPhone via
+/// Relays Pubky Pulse events from a watchOS app to its paired iPhone via
 /// `WCSession.transferUserInfo` — itself an OS-managed persistent queue
 /// that survives watch suspension and bluetooth disconnection, delivered
 /// when the iPhone counterpart is reachable again. Used as the offline
@@ -18,7 +18,7 @@ final class WatchConnectivityBridge: @unchecked Sendable {
     // 60 KB stays defensively under WC's practical payload ceiling.
     private static let maxChunkBytes = 60_000
 
-    private static let logger = Logger(subsystem: Owl.logSubsystem, category: "wc-bridge")
+    private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "wc-bridge")
 
     #if os(watchOS)
     private let delegate = WatchSessionDelegate()
@@ -28,7 +28,7 @@ final class WatchConnectivityBridge: @unchecked Sendable {
 
     /// Activate `WCSession.default`. Idempotent. Watch-side claims the
     /// delegate slot; iOS-side host apps forward inbound payloads via
-    /// `Owl.handleWatchUserInfo(_:)` from their own `WCSessionDelegate`.
+    /// `Pulse.handleWatchUserInfo(_:)` from their own `WCSessionDelegate`.
     func activate() {
         guard WCSession.isSupported() else { return }
         #if os(watchOS)

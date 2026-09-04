@@ -1,8 +1,8 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-struct OwlQuestionnaireMultiChoicePage: View {
-    let question: OwlQuestionnaireMultiChoiceQuestion
+struct PulseQuestionnaireMultiChoicePage: View {
+    let question: PulseQuestionnaireMultiChoiceQuestion
     @Binding var value: Set<String>
 
     var body: some View {
@@ -23,10 +23,10 @@ struct OwlQuestionnaireMultiChoicePage: View {
         }
     }
 
-    private func choiceRow(option: OwlQuestionnaireChoiceOption) -> some View {
+    private func choiceRow(option: PulseQuestionnaireChoiceOption) -> some View {
         let isSelected = value.contains(option.id)
         return Button {
-            OwlHaptics.tap()
+            PulseHaptics.tap()
             if isSelected {
                 value.remove(option.id)
             } else {

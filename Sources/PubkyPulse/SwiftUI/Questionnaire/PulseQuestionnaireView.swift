@@ -1,9 +1,9 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-/// SwiftUI view that renders an `OwlQuestionnaire` as a step-through flow
+/// SwiftUI view that renders an `PulseQuestionnaire` as a step-through flow
 /// (one question per page, with a progress bar) and submits via
-/// `Owl.submitQuestionnaireResponse`. The sheet is non-swipe-dismissible by
+/// `Pulse.submitQuestionnaireResponse`. The sheet is non-swipe-dismissible by
 /// default — consumers exit via the toolbar Cancel button or by finishing
 /// the flow.
 ///
@@ -12,7 +12,7 @@ import SwiftUI
 /// ```swift
 /// .sheet(isPresented: $show) {
 ///     NavigationStack {
-///         OwlQuestionnaireView(
+///         PulseQuestionnaireView(
 ///             questionnaire: spec,
 ///             onSubmitted: { _ in show = false },
 ///             onCancel: { show = false }
@@ -23,25 +23,25 @@ import SwiftUI
 ///
 /// Pass `showsConsent: true` to add the small "Have a minute for feedback?"
 /// detent up front. For auto-trigger gated on launch / foreground / install-age
-/// conditions, use the `.owlQuestionnaire(slug:trigger:...)` modifier instead —
+/// conditions, use the `.pulseQuestionnaire(slug:trigger:...)` modifier instead —
 /// it defaults `showsConsent` to `true`.
-public struct OwlQuestionnaireView: View {
-    private let questionnaire: OwlQuestionnaire
-    private let inProgress: OwlQuestionnaireDraft?
+public struct PulseQuestionnaireView: View {
+    private let questionnaire: PulseQuestionnaire
+    private let inProgress: PulseQuestionnaireDraft?
     private let showsConsent: Bool
     private let consentIcon: Image?
-    private let strings: OwlQuestionnaireStrings
-    private let onSubmitted: ((OwlQuestionnaireReceipt) -> Void)?
+    private let strings: PulseQuestionnaireStrings
+    private let onSubmitted: ((PulseQuestionnaireReceipt) -> Void)?
     private let onCancel: (() -> Void)?
     private let onDismissed: (() -> Void)?
 
     public init(
-        questionnaire: OwlQuestionnaire,
-        inProgress: OwlQuestionnaireDraft? = nil,
+        questionnaire: PulseQuestionnaire,
+        inProgress: PulseQuestionnaireDraft? = nil,
         showsConsent: Bool = false,
         consentIcon: Image? = Image(systemName: "quote.bubble.fill"),
-        strings: OwlQuestionnaireStrings = .default,
-        onSubmitted: ((OwlQuestionnaireReceipt) -> Void)? = nil,
+        strings: PulseQuestionnaireStrings = .default,
+        onSubmitted: ((PulseQuestionnaireReceipt) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onDismissed: (() -> Void)? = nil
     ) {
@@ -56,7 +56,7 @@ public struct OwlQuestionnaireView: View {
     }
 
     public var body: some View {
-        OwlQuestionnaireFlowContainer(
+        PulseQuestionnaireFlowContainer(
             questionnaire: questionnaire,
             inProgress: inProgress,
             showsConsent: showsConsent,

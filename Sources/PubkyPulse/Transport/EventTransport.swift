@@ -35,7 +35,7 @@ actor EventTransport {
     private var inFlightSendCount: Int = 0
     private var sendDrainContinuations: [CheckedContinuation<Void, Never>] = []
 
-    private static let logger = Logger(subsystem: Owl.logSubsystem, category: "transport")
+    private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "transport")
 
     init(
         endpoint: URL,
@@ -62,7 +62,7 @@ actor EventTransport {
 
     /// Build the URL for an attribution submission to a specific network. Kept
     /// as a helper so future network methods share the same namespace.
-    private func attributionURL(network: OwlAttributionNetwork) -> URL {
+    private func attributionURL(network: PulseAttributionNetwork) -> URL {
         endpoint.appendingPathComponent("v1/identity/attribution/\(network.slug)")
     }
 
@@ -301,7 +301,7 @@ actor EventTransport {
     }
 
     /// One-shot synchronous feedback submission. Does NOT queue offline — caller handles errors.
-    func submitFeedback(_ payload: FeedbackRequestBody) async -> Result<OwlFeedbackReceipt, OwlFeedbackError> {
+    func submitFeedback(_ payload: FeedbackRequestBody) async -> Result<PulseFeedbackReceipt, PulseFeedbackError> {
         let httpBody: Data
         do {
             httpBody = try encoder.encode(payload)
@@ -320,7 +320,7 @@ actor EventTransport {
                 do {
                     let decoded = try JSONDecoder().decode(FeedbackResponseBody.self, from: data)
                     let date = Self.iso8601.date(from: decoded.created_at) ?? Date()
-                    return .success(OwlFeedbackReceipt(id: decoded.id, createdAt: date))
+                    return .success(PulseFeedbackReceipt(id: decoded.id, createdAt: date))
                 } catch {
                     return .failure(.transportFailure("decode failed: \(error.localizedDescription)"))
                 }
@@ -347,7 +347,7 @@ actor EventTransport {
     /// reason is surfaced for diagnostics but the SDK still treats
     /// already_responded / globally_dismissed / inactive as silent no-ops.
     /// Throws only for slug-not-found (404) and transport failures.
-    func fetchQuestionnaire(slug: String, userId: String?, force: Bool = false) async -> Result<OwlQuestionnaireFetchResult, OwlQuestionnaireError> {
+    func fetchQuestionnaire(slug: String, userId: String?, force: Bool = false) async -> Result<PulseQuestionnaireFetchResult, PulseQuestionnaireError> {
         var components = URLComponents(url: questionnaireURL(slug: slug), resolvingAgainstBaseURL: false)
         var items: [URLQueryItem] = [URLQueryItem(name: "bundle_id", value: bundleId)]
         if let userId { items.append(URLQueryItem(name: "user_id", value: userId)) }
@@ -382,17 +382,17 @@ actor EventTransport {
             }
             if envelope.eligible, let q = envelope.questionnaire {
                 let draft = envelope.in_progress.map { body in
-                    OwlQuestionnaireDraft(
+                    PulseQuestionnaireDraft(
                         responseId: body.response_id,
                         answers: hydrateDraftAnswers(body.answers, against: q.schema)
                     )
                 }
-                return .success(OwlQuestionnaireFetchResult(questionnaire: q, inProgress: draft))
+                return .success(PulseQuestionnaireFetchResult(questionnaire: q, inProgress: draft))
             }
             // Ineligible — surface the reason for diagnostics so callers can
             // log or branch on it without parsing the raw envelope.
-            let reason = envelope.reason.flatMap(OwlQuestionnaireIneligibleReason.init(rawValue:))
-            return .success(OwlQuestionnaireFetchResult(questionnaire: nil, ineligibleReason: reason))
+            let reason = envelope.reason.flatMap(PulseQuestionnaireIneligibleReason.init(rawValue:))
+            return .success(PulseQuestionnaireFetchResult(questionnaire: nil, ineligibleReason: reason))
         } catch {
             return .failure(.transportFailure(error.localizedDescription))
         }
@@ -408,22 +408,22 @@ actor EventTransport {
         slug: String,
         userId: String?,
         sessionId: String?,
-        answers: [String: OwlQuestionnaireAnswerValue],
+        answers: [String: PulseQuestionnaireAnswerValue],
         isComplete: Bool,
         deviceInfo: DeviceInfo?,
         environment: String?,
         appVersion: String?,
         isDev: Bool
-    ) async -> Result<OwlQuestionnaireReceipt, OwlQuestionnaireError> {
+    ) async -> Result<PulseQuestionnaireReceipt, PulseQuestionnaireError> {
         let payload = QuestionnaireSubmitRequestBody(
             bundle_id: bundleId,
             session_id: sessionId,
             user_id: userId,
-            answers: OwlQuestionnaireAnswersWire(answers: answers),
+            answers: PulseQuestionnaireAnswersWire(answers: answers),
             is_complete: isComplete,
             app_version: appVersion,
-            sdk_name: OwlmetryVersion.name,
-            sdk_version: OwlmetryVersion.current,
+            sdk_name: PubkyPulseVersion.name,
+            sdk_version: PubkyPulseVersion.current,
             environment: environment,
             device_model: deviceInfo?.deviceModel,
             os_version: deviceInfo?.osVersion,
@@ -443,7 +443,7 @@ actor EventTransport {
                 do {
                     let decoded = try JSONDecoder().decode(QuestionnaireSubmitResponseBody.self, from: data)
                     let date = Self.iso8601.date(from: decoded.created_at) ?? Date()
-                    return .success(OwlQuestionnaireReceipt(
+                    return .success(PulseQuestionnaireReceipt(
                         id: decoded.id,
                         createdAt: date,
                         wasSubmitted: decoded.was_submitted ?? false
@@ -466,7 +466,7 @@ actor EventTransport {
         }
     }
 
-    func submitQuestionnaireDismiss(userId: String) async -> Result<Date, OwlQuestionnaireError> {
+    func submitQuestionnaireDismiss(userId: String) async -> Result<Date, PulseQuestionnaireError> {
         let payload = QuestionnaireDismissRequestBody(bundle_id: bundleId, user_id: userId)
         let httpBody: Data
         do { httpBody = try encoder.encode(payload) }
@@ -607,16 +607,16 @@ private struct AttributionResponseBody: Decodable {
 }
 
 /// Project wire-format draft answers onto the strongly-typed
-/// `OwlQuestionnaireAnswerValue` enum by dispatching on each question's type.
+/// `PulseQuestionnaireAnswerValue` enum by dispatching on each question's type.
 /// Answers whose question id is no longer in the schema (mid-draft schema
 /// edits) or whose shape doesn't match the question type are skipped — the
 /// SDK pre-fill is best-effort, and the server prunes unknown keys when the
 /// user finally submits.
 func hydrateDraftAnswers(
     _ raw: [String: AnyAnswerJSON],
-    against schema: OwlQuestionnaireSchema
-) -> [String: OwlQuestionnaireAnswerValue] {
-    var out: [String: OwlQuestionnaireAnswerValue] = [:]
+    against schema: PulseQuestionnaireSchema
+) -> [String: PulseQuestionnaireAnswerValue] {
+    var out: [String: PulseQuestionnaireAnswerValue] = [:]
     for question in schema.questions {
         guard let value = raw[question.id] else { continue }
         switch (question, value) {

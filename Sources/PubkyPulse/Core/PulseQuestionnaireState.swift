@@ -6,9 +6,9 @@ import Foundation
 /// counters and the install timestamp.
 ///
 /// All counters increment idempotently per process via in-memory flags so a
-/// hot reload of `Owl.configure(...)` doesn't double-count.
-public final class OwlQuestionnaireState: @unchecked Sendable {
-    public static let shared = OwlQuestionnaireState()
+/// hot reload of `Pulse.configure(...)` doesn't double-count.
+public final class PulseQuestionnaireState: @unchecked Sendable {
+    public static let shared = PulseQuestionnaireState()
 
     static let launchCountKey = "owlmetry.questionnaire.launch_count"
     static let foregroundCountKey = "owlmetry.questionnaire.foreground_count"
@@ -22,7 +22,7 @@ public final class OwlQuestionnaireState: @unchecked Sendable {
         self.defaults = defaults
     }
 
-    /// Called once per process from the tail of `Owl.configureWith(_:)`.
+    /// Called once per process from the tail of `Pulse.configureWith(_:)`.
     /// Increments `launch_count` and sets `first_launch_at` the first time.
     public func markConfiguredOnce(now: Date = Date()) {
         lock.lock()

@@ -1,8 +1,8 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-struct OwlQuestionnaireRatingPage: View {
-    let question: OwlQuestionnaireRatingQuestion
+struct PulseQuestionnaireRatingPage: View {
+    let question: PulseQuestionnaireRatingQuestion
     @Binding var value: Int?
 
     var body: some View {
@@ -32,7 +32,7 @@ struct OwlQuestionnaireRatingPage: View {
     private func starButton(for star: Int) -> some View {
         let filled = (value ?? 0) >= star
         return Button {
-            OwlHaptics.tap()
+            PulseHaptics.tap()
             value = star
         } label: {
             Image(systemName: filled ? "star.fill" : "star")

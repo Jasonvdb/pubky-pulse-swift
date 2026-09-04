@@ -5,7 +5,7 @@ import SwiftUI
 /// through and including the current index. Matches the visual pattern in
 /// `SewingPatterns/iOS/.../OnboardingView.swift:183-194` and
 /// `LegalScan/.../OnboardingView.swift:23-32`.
-struct OwlQuestionnaireProgressBar: View {
+struct PulseQuestionnaireProgressBar: View {
     let current: Int
     let total: Int
 

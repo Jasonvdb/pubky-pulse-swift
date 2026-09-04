@@ -1,8 +1,8 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-struct OwlQuestionnaireNpsPage: View {
-    let question: OwlQuestionnaireNpsQuestion
+struct PulseQuestionnaireNpsPage: View {
+    let question: PulseQuestionnaireNpsQuestion
     @Binding var value: Int?
     let lowLabel: LocalizedStringResource
     let highLabel: LocalizedStringResource
@@ -45,7 +45,7 @@ struct OwlQuestionnaireNpsPage: View {
     private func npsButton(for score: Int, size: CGFloat) -> some View {
         let isSelected = value == score
         return Button {
-            OwlHaptics.tap()
+            PulseHaptics.tap()
             value = score
         } label: {
             Text("\(score)")

@@ -4,7 +4,7 @@ import Foundation
 extension LogEvent {
     static func stub(
         message: String,
-        level: OwlLogLevel = .info,
+        level: PulseLogLevel = .info,
         screenName: String? = nil,
         customAttributes: [String: String]? = nil,
         userId: String? = nil
@@ -21,8 +21,8 @@ extension LogEvent {
             environment: .ios,
             osVersion: "17.0.0",
             appVersion: "1.0",
-            sdkName: OwlmetryVersion.name,
-            sdkVersion: OwlmetryVersion.current,
+            sdkName: PubkyPulseVersion.name,
+            sdkVersion: PubkyPulseVersion.current,
             buildNumber: "1",
             deviceModel: "iPhone16,1",
             locale: "en_US",

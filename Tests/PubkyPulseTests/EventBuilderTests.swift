@@ -41,8 +41,8 @@ final class EventBuilderTests: XCTestCase {
         XCTAssertEqual(event.locale, "en_US")
         XCTAssertEqual(event.preferredLanguage, "fr-CA")
         XCTAssertEqual(event.supportedLanguages, ["en", "de"])
-        XCTAssertEqual(event.sdkName, OwlmetryVersion.name)
-        XCTAssertEqual(event.sdkVersion, OwlmetryVersion.current)
+        XCTAssertEqual(event.sdkName, PubkyPulseVersion.name)
+        XCTAssertEqual(event.sdkVersion, PubkyPulseVersion.current)
     }
 
     func testSourceModuleFormattedFromFileFunctionLine() {

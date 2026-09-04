@@ -1,11 +1,11 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-/// In-sheet success page rendered for `OwlQuestionnairePhase.success`.
+/// In-sheet success page rendered for `PulseQuestionnairePhase.success`.
 /// Replaces the system alert from the old form-based view so dismissal
 /// stays a single tap that goes through `Done` (matches the step-flow's
 /// non-swipe-dismissible contract).
-struct OwlQuestionnaireSuccessView: View {
+struct PulseQuestionnaireSuccessView: View {
     let title: LocalizedStringResource
     let message: LocalizedStringResource
     let doneLabel: LocalizedStringResource
@@ -15,7 +15,7 @@ struct OwlQuestionnaireSuccessView: View {
         // Done button pinned outside the ScrollView so it's always reachable
         // regardless of how long the success message is. The ScrollView wraps
         // the icon + title + message so any custom override from
-        // `OwlQuestionnaireStrings` that exceeds the sheet height scrolls
+        // `PulseQuestionnaireStrings` that exceeds the sheet height scrolls
         // instead of pushing the button off-screen.
         VStack(spacing: 0) {
             GeometryReader { proxy in
@@ -56,7 +56,7 @@ struct OwlQuestionnaireSuccessView: View {
             }
 
             Button {
-                OwlHaptics.tap()
+                PulseHaptics.tap()
                 onDone()
             } label: {
                 Text(doneLabel)

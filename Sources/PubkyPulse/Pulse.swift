@@ -2,12 +2,12 @@ import Darwin
 import Foundation
 import os
 
-public enum Owl {
+public enum Pulse {
     static let logSubsystem = "com.owlmetry.sdk"
-    private static let logger = Logger(subsystem: logSubsystem, category: "owl")
+    private static let logger = Logger(subsystem: logSubsystem, category: "pulse")
 
     private struct State {
-        var configuration: OwlConfiguration?
+        var configuration: PulseConfiguration?
         var deviceInfo: DeviceInfo?
         var transport: EventTransport?
         var attachmentUploader: AttachmentUploader?
@@ -22,7 +22,7 @@ public enum Owl {
         // Cold-launch race: iOS may deliver a watch payload before
         // configure() finishes. Buffered here, drained at end of configure.
         var pendingWatchEvents: [LogEvent] = []
-        // Count of `Owl.log(...)` Tasks that have spawned but not yet
+        // Count of `Pulse.log(...)` Tasks that have spawned but not yet
         // reached `EventTransport.enqueue`. `setUser`, `setUserProperties`,
         // and the configure-time startup reclaim await this draining to
         // zero before POSTing, so the claim/properties write arrives at
@@ -49,7 +49,7 @@ public enum Owl {
         consoleLogging: Bool = true,
         attributionEnabled: Bool = true
     ) throws {
-        let config = try OwlConfiguration(endpoint: endpoint, apiKey: apiKey, flushOnBackground: flushOnBackground, compressionEnabled: compressionEnabled, networkTrackingEnabled: networkTrackingEnabled, consoleLogging: consoleLogging, attributionEnabled: attributionEnabled)
+        let config = try PulseConfiguration(endpoint: endpoint, apiKey: apiKey, flushOnBackground: flushOnBackground, compressionEnabled: compressionEnabled, networkTrackingEnabled: networkTrackingEnabled, consoleLogging: consoleLogging, attributionEnabled: attributionEnabled)
         try configureWith(config)
     }
 
@@ -64,11 +64,11 @@ public enum Owl {
         consoleLogging: Bool = true,
         attributionEnabled: Bool = true
     ) throws {
-        let config = try OwlConfiguration(endpoint: endpoint, apiKey: apiKey, bundleId: bundleId, flushOnBackground: flushOnBackground, compressionEnabled: compressionEnabled, networkTrackingEnabled: networkTrackingEnabled, consoleLogging: consoleLogging, attributionEnabled: attributionEnabled)
+        let config = try PulseConfiguration(endpoint: endpoint, apiKey: apiKey, bundleId: bundleId, flushOnBackground: flushOnBackground, compressionEnabled: compressionEnabled, networkTrackingEnabled: networkTrackingEnabled, consoleLogging: consoleLogging, attributionEnabled: attributionEnabled)
         try configureWith(config)
     }
 
-    private static func configureWith(_ config: OwlConfiguration) throws {
+    private static func configureWith(_ config: PulseConfiguration) throws {
 
         let monitor = NetworkMonitor()
         let queue = OfflineQueue()
@@ -173,7 +173,7 @@ public enum Owl {
             Task.detached(priority: .background) {
                 await AppleSearchAdsAttribution.captureIfNeeded(
                     anonymousId: anonId,
-                    currentUserId: { Owl.currentUserId ?? anonId },
+                    currentUserId: { Pulse.currentUserId ?? anonId },
                     transport: transport
                 )
             }
@@ -188,8 +188,8 @@ public enum Owl {
             file: #file, function: #function, line: #line)
 
         // Bump the per-install launch counter once per process. Drives the
-        // `.owlQuestionnaire(...)` trigger conditions.
-        OwlQuestionnaireState.shared.markConfiguredOnce()
+        // `.pulseQuestionnaire(...)` trigger conditions.
+        PulseQuestionnaireState.shared.markConfiguredOnce()
     }
 
     // MARK: - Session
@@ -221,7 +221,7 @@ public enum Owl {
         }
 
         // Fire claim request to update previously-sent anonymous events.
-        // Wait for any in-flight `Owl.log(...)` Tasks to reach the transport
+        // Wait for any in-flight `Pulse.log(...)` Tasks to reach the transport
         // buffer first — otherwise the claim's own `flushAll()` could see an
         // empty buffer, POST against an empty events table on the server,
         // and the late-arriving anon events would orphan onto a separate
@@ -276,12 +276,12 @@ public enum Owl {
     // MARK: - Attribution
 
     /// Submit an Apple Search Ads attribution token obtained by the app
-    /// itself (for example from a custom attribution flow) and let Owlmetry
+    /// itself (for example from a custom attribution flow) and let Pubky Pulse
     /// resolve it with Apple.
     ///
-    /// You do **not** need to call this in normal use — `Owl.configure()`
+    /// You do **not** need to call this in normal use — `Pulse.configure()`
     /// auto-captures attribution in the background. Provided for apps that
-    /// opt out via `OwlConfiguration.attributionEnabled = false` and manage
+    /// opt out via `PulseConfiguration.attributionEnabled = false` and manage
     /// token acquisition themselves, and for testing.
     ///
     /// Returns `true` on successful server submission (attributed or not),
@@ -301,7 +301,7 @@ public enum Owl {
     }
 
     /// Clear the "captured" flag for Apple Search Ads attribution on the
-    /// current install so the next `Owl.configure()` re-attempts capture.
+    /// current install so the next `Pulse.configure()` re-attempts capture.
     /// Intended for development builds and UI tests; production apps should
     /// not need this.
     public static func resetAppleSearchAdsAttributionCapture() {
@@ -316,7 +316,7 @@ public enum Owl {
         _ message: String,
         screenName: String? = nil,
         attributes: [String: String?] = [:],
-        attachments: [OwlAttachment]? = nil,
+        attachments: [PulseAttachment]? = nil,
         file: String = #file,
         function: String = #function,
         line: Int = #line
@@ -329,7 +329,7 @@ public enum Owl {
         _ message: String,
         screenName: String? = nil,
         attributes: [String: String?] = [:],
-        attachments: [OwlAttachment]? = nil,
+        attachments: [PulseAttachment]? = nil,
         file: String = #file,
         function: String = #function,
         line: Int = #line
@@ -342,7 +342,7 @@ public enum Owl {
         _ message: String,
         screenName: String? = nil,
         attributes: [String: String?] = [:],
-        attachments: [OwlAttachment]? = nil,
+        attachments: [PulseAttachment]? = nil,
         file: String = #file,
         function: String = #function,
         line: Int = #line
@@ -355,7 +355,7 @@ public enum Owl {
         _ message: String,
         screenName: String? = nil,
         attributes: [String: String?] = [:],
-        attachments: [OwlAttachment]? = nil,
+        attachments: [PulseAttachment]? = nil,
         file: String = #file,
         function: String = #function,
         line: Int = #line
@@ -371,13 +371,13 @@ public enum Owl {
     /// classes with the same wording stay on separate issues.
     ///
     /// Pass an optional `message` to override the auto-derived event message
-    /// with caller context (e.g. `Owl.error(err, "while loading photos")`).
+    /// with caller context (e.g. `Pulse.error(err, "while loading photos")`).
     public static func error(
         _ error: Error,
         _ message: String? = nil,
         screenName: String? = nil,
         attributes: [String: String?] = [:],
-        attachments: [OwlAttachment]? = nil,
+        attachments: [PulseAttachment]? = nil,
         file: String = #file,
         function: String = #function,
         line: Int = #line
@@ -432,7 +432,7 @@ public enum Owl {
 
     // MARK: - User Feedback
 
-    /// Submit user feedback synchronously. Returns an `OwlFeedbackReceipt` on success
+    /// Submit user feedback synchronously. Returns an `PulseFeedbackReceipt` on success
     /// so the caller can confirm the server received the submission.
     ///
     /// This is NOT offline-queued — if the network is unavailable the call throws and
@@ -448,9 +448,9 @@ public enum Owl {
         message: String,
         name: String? = nil,
         email: String? = nil
-    ) async throws -> OwlFeedbackReceipt {
+    ) async throws -> PulseFeedbackReceipt {
         let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { throw OwlFeedbackError.emptyMessage }
+        guard !trimmed.isEmpty else { throw PulseFeedbackError.emptyMessage }
 
         let snapshot = state.withLock { s -> (EventTransport, String, DeviceInfo, String?, String?)? in
             guard let transport = s.transport,
@@ -458,7 +458,7 @@ public enum Owl {
                   let deviceInfo = s.deviceInfo else {
                 if !s.hasWarnedNotConfigured {
                     s.hasWarnedNotConfigured = true
-                    logger.warning("Owl.configure() has not been called. sendFeedback dropped.")
+                    logger.warning("Pulse.configure() has not been called. sendFeedback dropped.")
                 }
                 return nil
             }
@@ -466,7 +466,7 @@ public enum Owl {
         }
 
         guard let (transport, bundleId, deviceInfo, userId, sessionId) = snapshot else {
-            throw OwlFeedbackError.notConfigured
+            throw PulseFeedbackError.notConfigured
         }
 
         #if DEBUG
@@ -489,8 +489,8 @@ public enum Owl {
             submitter_name: trimNil(name),
             submitter_email: trimNil(email),
             app_version: deviceInfo.appVersion,
-            sdk_name: OwlmetryVersion.name,
-            sdk_version: OwlmetryVersion.current,
+            sdk_name: PubkyPulseVersion.name,
+            sdk_version: PubkyPulseVersion.current,
             environment: deviceInfo.platform.rawValue,
             device_model: deviceInfo.deviceModel,
             os_version: deviceInfo.osVersion,
@@ -513,12 +513,12 @@ public enum Owl {
 
     // MARK: - Questionnaires
 
-    /// Total number of times `Owl.configure(...)` has completed since install.
-    public static var launchCount: Int { OwlQuestionnaireState.shared.launchCount }
+    /// Total number of times `Pulse.configure(...)` has completed since install.
+    public static var launchCount: Int { PulseQuestionnaireState.shared.launchCount }
     /// Total number of foreground transitions since install.
-    public static var foregroundCount: Int { OwlQuestionnaireState.shared.foregroundCount }
-    /// Timestamp of the first-ever `Owl.configure(...)` on this install.
-    public static var firstLaunchAt: Date? { OwlQuestionnaireState.shared.firstLaunchAt }
+    public static var foregroundCount: Int { PulseQuestionnaireState.shared.foregroundCount }
+    /// Timestamp of the first-ever `Pulse.configure(...)` on this install.
+    public static var firstLaunchAt: Date? { PulseQuestionnaireState.shared.firstLaunchAt }
 
     /// Fetch a questionnaire by slug, plus any in-progress draft the caller
     /// already started. Result's `.questionnaire` is nil when the user is
@@ -530,9 +530,9 @@ public enum Owl {
     /// `globallyDismissed` — useful for previewing the questionnaire UI in
     /// debug builds without resetting state. `inactive` is still respected
     /// (no spec to return for a paused questionnaire).
-    public static func fetchQuestionnaire(slug: String, force: Bool = false) async throws -> OwlQuestionnaireFetchResult {
+    public static func fetchQuestionnaire(slug: String, force: Bool = false) async throws -> PulseQuestionnaireFetchResult {
         let snapshot = transportSnapshot()
-        guard let snapshot else { throw OwlQuestionnaireError.notConfigured }
+        guard let snapshot else { throw PulseQuestionnaireError.notConfigured }
         let result = await snapshot.transport.fetchQuestionnaire(slug: slug, userId: snapshot.userId, force: force)
         switch result {
         case .success(let res): return res
@@ -551,11 +551,11 @@ public enum Owl {
     /// saves to avoid flooding the event stream.
     public static func saveQuestionnaireResponse(
         slug: String,
-        answers: [String: OwlQuestionnaireAnswerValue],
+        answers: [String: PulseQuestionnaireAnswerValue],
         isComplete: Bool
-    ) async throws -> OwlQuestionnaireReceipt {
+    ) async throws -> PulseQuestionnaireReceipt {
         let snapshot = transportSnapshot()
-        guard let snapshot else { throw OwlQuestionnaireError.notConfigured }
+        guard let snapshot else { throw PulseQuestionnaireError.notConfigured }
 
         #if DEBUG
         let isDev = true
@@ -593,7 +593,7 @@ public enum Owl {
     public static func dismissQuestionnaires() async throws -> Date {
         let snapshot = transportSnapshot()
         guard let snapshot, let userId = snapshot.userId else {
-            throw OwlQuestionnaireError.notConfigured
+            throw PulseQuestionnaireError.notConfigured
         }
         let result = await snapshot.transport.submitQuestionnaireDismiss(userId: userId)
         switch result {
@@ -622,10 +622,10 @@ public enum Owl {
     }
 
     /// Debug-only — clears the in-process "already shown this slug" cache so
-    /// `.owlQuestionnaire(...)` can re-evaluate the trigger without an app
+    /// `.pulseQuestionnaire(...)` can re-evaluate the trigger without an app
     /// relaunch. Intended for QA and demo apps. Server-side eligibility
     /// (already-responded, globally-dismissed) is NOT affected — combine with
-    /// `Owl.clearUser(newAnonymousId: true)` to test against a fresh user.
+    /// `Pulse.clearUser(newAnonymousId: true)` to test against a fresh user.
     public static func _debugClearShownQuestionnaires() {
         shownLock.lock(); defer { shownLock.unlock() }
         shownSlugs.removeAll()
@@ -644,7 +644,7 @@ public enum Owl {
                   let deviceInfo = s.deviceInfo else {
                 if !s.hasWarnedNotConfigured {
                     s.hasWarnedNotConfigured = true
-                    logger.warning("Owl.configure() has not been called. Questionnaire call dropped.")
+                    logger.warning("Pulse.configure() has not been called. Questionnaire call dropped.")
                 }
                 return nil
             }
@@ -691,9 +691,9 @@ public enum Owl {
         file: String = #file,
         function: String = #function,
         line: Int = #line
-    ) -> OwlOperation {
+    ) -> PulseOperation {
         let slug = normalizeSlug(metric)
-        let op = OwlOperation(metric: slug)
+        let op = PulseOperation(metric: slug)
         var attrs: [String: String?] = attributes
         attrs["tracking_id"] = op.trackingId
         info("metric:\(slug):start", attributes: attrs, file: file, function: function, line: line)
@@ -719,21 +719,21 @@ public enum Owl {
     // MARK: - watchOS Companion
 
     #if canImport(WatchConnectivity) && !os(watchOS)
-    /// Forward a `WCSession` user-info payload into the Owlmetry pipeline.
+    /// Forward a `WCSession` user-info payload into the Pubky Pulse pipeline.
     /// Call this from your iPhone app's existing `WCSessionDelegate`:
     ///
     /// ```swift
     /// func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
-    ///     if Owl.handleWatchUserInfo(userInfo) { return }
+    ///     if Pulse.handleWatchUserInfo(userInfo) { return }
     ///     // ... your existing handling
     /// }
     /// ```
     ///
-    /// Returns `true` when the payload was an Owlmetry envelope (decoded
+    /// Returns `true` when the payload was a Pubky Pulse envelope (decoded
     /// and queued for ingest), `false` otherwise — let the caller continue
     /// its own handling.
     ///
-    /// Safe to call before `Owl.configure()`: events are buffered and
+    /// Safe to call before `Pulse.configure()`: events are buffered and
     /// drained automatically once configuration completes.
     @discardableResult
     public static func handleWatchUserInfo(_ userInfo: [String: Any]) -> Bool {
@@ -795,7 +795,7 @@ public enum Owl {
 
     // MARK: - Internal
 
-    /// Suspend until every in-flight `Owl.log(...)` Task has reached the
+    /// Suspend until every in-flight `Pulse.log(...)` Task has reached the
     /// EventTransport buffer. Used by setUser, setUserProperties, the
     /// configure-time startup reclaim, and the attribution submit path so
     /// outbound writes that depend on prior events being ingestible never
@@ -831,7 +831,7 @@ public enum Owl {
 
     private static func printToConsole(
         _ message: String,
-        level: OwlLogLevel,
+        level: PulseLogLevel,
         attributes: [String: String]?
     ) {
         if message.hasPrefix("sdk:") { return }
@@ -877,10 +877,10 @@ public enum Owl {
 
     private static func log(
         _ message: String,
-        level: OwlLogLevel,
+        level: PulseLogLevel,
         screenName: String?,
         attributes: [String: String]?,
-        attachments: [OwlAttachment]? = nil,
+        attachments: [PulseAttachment]? = nil,
         file: String,
         function: String,
         line: Int
@@ -892,7 +892,7 @@ public enum Owl {
                   let config = s.configuration else {
                 if !s.hasWarnedNotConfigured {
                     s.hasWarnedNotConfigured = true
-                    logger.warning("Owl.configure() has not been called. Events are being dropped.")
+                    logger.warning("Pulse.configure() has not been called. Events are being dropped.")
                 }
                 return nil
             }

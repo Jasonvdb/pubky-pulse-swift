@@ -12,7 +12,7 @@ import AppKit
 final class LifecycleObserver: @unchecked Sendable {
     private let transport: EventTransport
     private let offlineQueue: OfflineQueue
-    private let logger = Logger(subsystem: Owl.logSubsystem, category: "lifecycle")
+    private let logger = Logger(subsystem: Pulse.logSubsystem, category: "lifecycle")
     private var observers: [NSObjectProtocol] = []
 
     init(transport: EventTransport, offlineQueue: OfflineQueue) {
@@ -35,8 +35,8 @@ final class LifecycleObserver: @unchecked Sendable {
                 forName: UIApplication.willEnterForegroundNotification,
                 object: nil, queue: .main
             ) { _ in
-                OwlQuestionnaireState.shared.incrementForeground()
-                Owl.info("sdk:app_foregrounded")
+                PulseQuestionnaireState.shared.incrementForeground()
+                Pulse.info("sdk:app_foregrounded")
             }
         )
         observers.append(
@@ -61,8 +61,8 @@ final class LifecycleObserver: @unchecked Sendable {
                 forName: WKApplication.willEnterForegroundNotification,
                 object: nil, queue: .main
             ) { _ in
-                OwlQuestionnaireState.shared.incrementForeground()
-                Owl.info("sdk:app_foregrounded")
+                PulseQuestionnaireState.shared.incrementForeground()
+                Pulse.info("sdk:app_foregrounded")
             }
         )
         #elseif canImport(AppKit)
@@ -71,8 +71,8 @@ final class LifecycleObserver: @unchecked Sendable {
                 forName: NSApplication.didBecomeActiveNotification,
                 object: nil, queue: .main
             ) { _ in
-                OwlQuestionnaireState.shared.incrementForeground()
-                Owl.info("sdk:app_foregrounded")
+                PulseQuestionnaireState.shared.incrementForeground()
+                Pulse.info("sdk:app_foregrounded")
             }
         )
         observers.append(
@@ -110,7 +110,7 @@ final class LifecycleObserver: @unchecked Sendable {
             return
         }
 
-        Owl.info("sdk:app_backgrounded")
+        Pulse.info("sdk:app_backgrounded")
 
         Task {
             await self.transport.flushAll()
@@ -127,7 +127,7 @@ final class LifecycleObserver: @unchecked Sendable {
     // the flush itself. Best-effort but durable: events already handed to
     // WC or disk survive suspension.
     private func handleWatchBackground() {
-        Owl.info("sdk:app_backgrounded")
+        Pulse.info("sdk:app_backgrounded")
         Task {
             await self.transport.flushAll()
             await self.transport.persistBufferToDisk()

@@ -1,8 +1,8 @@
 import Foundation
 
 /// Tracks a metric operation lifecycle (start → complete/fail/cancel).
-/// Created by `Owl.startOperation()` — do not instantiate directly.
-public final class OwlOperation: Sendable {
+/// Created by `Pulse.startOperation()` — do not instantiate directly.
+public final class PulseOperation: Sendable {
     public let trackingId: String
     let metric: String
     let startTime: ContinuousClock.Instant
@@ -23,7 +23,7 @@ public final class OwlOperation: Sendable {
         var attrs: [String: String?] = attributes
         attrs["tracking_id"] = trackingId
         attrs["duration_ms"] = String(durationMs())
-        Owl.info("metric:\(metric):complete", attributes: attrs, file: file, function: function, line: line)
+        Pulse.info("metric:\(metric):complete", attributes: attrs, file: file, function: function, line: line)
     }
 
     /// Record a failed operation. Auto-adds duration_ms + error.
@@ -38,7 +38,7 @@ public final class OwlOperation: Sendable {
         attrs["tracking_id"] = trackingId
         attrs["duration_ms"] = String(durationMs())
         attrs["error"] = error
-        Owl.error("metric:\(metric):fail", attributes: attrs, file: file, function: function, line: line)
+        Pulse.error("metric:\(metric):fail", attributes: attrs, file: file, function: function, line: line)
     }
 
     /// Cancel the operation. Auto-adds duration_ms.
@@ -51,7 +51,7 @@ public final class OwlOperation: Sendable {
         var attrs: [String: String?] = attributes
         attrs["tracking_id"] = trackingId
         attrs["duration_ms"] = String(durationMs())
-        Owl.info("metric:\(metric):cancel", attributes: attrs, file: file, function: function, line: line)
+        Pulse.info("metric:\(metric):cancel", attributes: attrs, file: file, function: function, line: line)
     }
 
     private func durationMs() -> Int {

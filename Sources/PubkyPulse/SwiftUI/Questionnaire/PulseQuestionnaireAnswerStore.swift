@@ -3,7 +3,7 @@ import Foundation
 /// Pure value-type collector for the questionnaire flow's per-question
 /// answers. Lives separately from the SwiftUI container so the validation +
 /// wire-encoding logic is unit-testable without a SwiftUI runtime.
-struct OwlQuestionnaireAnswerStore: Equatable {
+struct PulseQuestionnaireAnswerStore: Equatable {
     var text: [String: String] = [:]
     var single: [String: String] = [:]
     var multi: [String: Set<String>] = [:]
@@ -14,7 +14,7 @@ struct OwlQuestionnaireAnswerStore: Equatable {
     /// payload of the eligibility envelope). Unknown question shapes are
     /// silently skipped — pre-fill is best-effort and the server prunes
     /// stale keys when the user completes.
-    mutating func prefill(from answers: [String: OwlQuestionnaireAnswerValue]) {
+    mutating func prefill(from answers: [String: PulseQuestionnaireAnswerValue]) {
         for (key, value) in answers {
             switch value {
             case .text(let s):       text[key] = s
@@ -30,7 +30,7 @@ struct OwlQuestionnaireAnswerStore: Equatable {
     /// answered yet. Returns `schema.questions.count - 1` when every question
     /// is answered (so the flow lands on the last page with the Submit
     /// button live). Returns 0 for an empty store.
-    func firstUnansweredIndex(in schema: OwlQuestionnaireSchema) -> Int {
+    func firstUnansweredIndex(in schema: PulseQuestionnaireSchema) -> Int {
         let questions = schema.questions
         for (i, q) in questions.enumerated() {
             if !isAnswered(q) { return i }
@@ -38,7 +38,7 @@ struct OwlQuestionnaireAnswerStore: Equatable {
         return max(0, questions.count - 1)
     }
 
-    func isAnswered(_ question: OwlQuestionnaireQuestion) -> Bool {
+    func isAnswered(_ question: PulseQuestionnaireQuestion) -> Bool {
         switch question {
         case .text(let q):
             let v = text[q.id] ?? ""
@@ -54,15 +54,15 @@ struct OwlQuestionnaireAnswerStore: Equatable {
         }
     }
 
-    func hasAllRequired(_ schema: OwlQuestionnaireSchema) -> Bool {
+    func hasAllRequired(_ schema: PulseQuestionnaireSchema) -> Bool {
         for q in schema.questions where q.required {
             if !isAnswered(q) { return false }
         }
         return true
     }
 
-    func collected(_ schema: OwlQuestionnaireSchema) -> [String: OwlQuestionnaireAnswerValue] {
-        var out: [String: OwlQuestionnaireAnswerValue] = [:]
+    func collected(_ schema: PulseQuestionnaireSchema) -> [String: PulseQuestionnaireAnswerValue] {
+        var out: [String: PulseQuestionnaireAnswerValue] = [:]
         for q in schema.questions {
             switch q {
             case .text(let tq):

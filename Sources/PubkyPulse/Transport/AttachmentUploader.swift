@@ -17,7 +17,7 @@ actor AttachmentUploader {
         let clientEventId: String
         let userId: String?
         let isDev: Bool
-        let attachment: OwlAttachment
+        let attachment: PulseAttachment
     }
 
     private struct ReserveResponse: Decodable {
@@ -25,7 +25,7 @@ actor AttachmentUploader {
         let upload_url: String
     }
 
-    private static let logger = Logger(subsystem: Owl.logSubsystem, category: "attachments")
+    private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "attachments")
     // Absolute SDK safety net (2 GB). Real enforcement is server-side against the
     // project's per-user and project quotas.
     private static let defaultSdkHardCapBytes: Int64 = 2 * 1024 * 1024 * 1024
@@ -42,7 +42,7 @@ actor AttachmentUploader {
         self.session = session
     }
 
-    func enqueue(clientEventId: String, userId: String?, isDev: Bool, attachments: [OwlAttachment]) {
+    func enqueue(clientEventId: String, userId: String?, isDev: Bool, attachments: [PulseAttachment]) {
         for attachment in attachments {
             pending.append(PendingUpload(clientEventId: clientEventId, userId: userId, isDev: isDev, attachment: attachment))
         }
@@ -168,7 +168,7 @@ actor AttachmentUploader {
         }
     }
 
-    private func loadBytes(for attachment: OwlAttachment) throws -> (Data, String) {
+    private func loadBytes(for attachment: PulseAttachment) throws -> (Data, String) {
         switch attachment.source {
         case .data(let bytes):
             return (bytes, attachment.contentType ?? defaultContentType(for: attachment.name))

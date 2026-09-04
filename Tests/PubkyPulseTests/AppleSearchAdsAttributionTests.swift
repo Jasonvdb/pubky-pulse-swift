@@ -1,7 +1,7 @@
 import XCTest
 @testable import PubkyPulse
 
-/// End-to-end Apple Search Ads attribution tests against a real Owlmetry
+/// End-to-end Apple Search Ads attribution tests against a real Pubky Pulse
 /// server. Uses the server's `dev_mock` body field to bypass the upstream
 /// Apple AdServices call — the simulator cannot mint a real AAAttribution
 /// token, and we want these tests to validate the SDK <-> server wire
@@ -14,8 +14,8 @@ final class AppleSearchAdsAttributionTests: XCTestCase {
     static let testBundleId = "com.owlmetry.test"
 
     override func setUp() async throws {
-        await Owl.reset()
-        Owl.clearUser(newAnonymousId: true)
+        await Pulse.reset()
+        Pulse.clearUser(newAnonymousId: true)
         IdentityManager.clearUserId()
 
         // Reset per-anon attribution capture state so tests don't interfere.
@@ -29,7 +29,7 @@ final class AppleSearchAdsAttributionTests: XCTestCase {
     }
 
     override func tearDown() async throws {
-        await Owl.shutdown()
+        await Pulse.shutdown()
     }
 
     // MARK: - Direct server submission via the raw endpoint
@@ -59,10 +59,10 @@ final class AppleSearchAdsAttributionTests: XCTestCase {
 
     // MARK: - SDK-level tests
 
-    /// `Owl.sendAppleSearchAdsAttributionToken(_:)` should succeed end-to-end
+    /// `Pulse.sendAppleSearchAdsAttributionToken(_:)` should succeed end-to-end
     /// when the server is in dev_mock=attributed mode.
     func testSDKPublicApiSubmitsAttributionViaTransport() async throws {
-        try Owl.configure(
+        try Pulse.configure(
             endpoint: Self.testEndpoint,
             apiKey: Self.testClientKey,
             bundleId: Self.testBundleId,
@@ -98,7 +98,7 @@ final class AppleSearchAdsAttributionTests: XCTestCase {
     /// Pending responses must NOT mark the anon as captured, so the next
     /// `configure()` can retry. The pending-attempts counter should bump.
     func testPendingDoesNotMarkCaptured() async throws {
-        try Owl.configure(
+        try Pulse.configure(
             endpoint: Self.testEndpoint,
             apiKey: Self.testClientKey,
             bundleId: Self.testBundleId,
@@ -132,7 +132,7 @@ final class AppleSearchAdsAttributionTests: XCTestCase {
     /// by writing `attribution_source=none` and marking the anon as
     /// captured so we stop retrying forever.
     func testPendingCapGivesUpAndWritesUnattributed() async throws {
-        try Owl.configure(
+        try Pulse.configure(
             endpoint: Self.testEndpoint,
             apiKey: Self.testClientKey,
             bundleId: Self.testBundleId,
@@ -179,7 +179,7 @@ final class AppleSearchAdsAttributionTests: XCTestCase {
     private func snapshotIdentity() -> IdentitySnapshot {
         let anon = IdentityManager.anonymousId()
         return IdentitySnapshot(
-            transport: Owl._transportForTests(),
+            transport: Pulse._transportForTests(),
             userId: anon,
             anonymousId: anon
         )

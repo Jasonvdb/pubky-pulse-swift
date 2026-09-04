@@ -1,59 +1,59 @@
 import XCTest
 @testable import PubkyPulse
 
-final class OwlQuestionnaireFlowTests: XCTestCase {
+final class PulseQuestionnaireFlowTests: XCTestCase {
 
     // MARK: - Phase equality
 
     func testPhaseEquality() {
-        let receipt = OwlQuestionnaireReceipt(id: "r1", createdAt: Date(timeIntervalSince1970: 0), wasSubmitted: true)
-        XCTAssertEqual(OwlQuestionnairePhase.consent, .consent)
-        XCTAssertEqual(OwlQuestionnairePhase.running(index: 2), .running(index: 2))
-        XCTAssertNotEqual(OwlQuestionnairePhase.running(index: 0), .running(index: 1))
-        XCTAssertEqual(OwlQuestionnairePhase.success(receipt), .success(receipt))
-        XCTAssertNotEqual(OwlQuestionnairePhase.consent, .running(index: 0))
+        let receipt = PulseQuestionnaireReceipt(id: "r1", createdAt: Date(timeIntervalSince1970: 0), wasSubmitted: true)
+        XCTAssertEqual(PulseQuestionnairePhase.consent, .consent)
+        XCTAssertEqual(PulseQuestionnairePhase.running(index: 2), .running(index: 2))
+        XCTAssertNotEqual(PulseQuestionnairePhase.running(index: 0), .running(index: 1))
+        XCTAssertEqual(PulseQuestionnairePhase.success(receipt), .success(receipt))
+        XCTAssertNotEqual(PulseQuestionnairePhase.consent, .running(index: 0))
     }
 
     // MARK: - Answer store
 
-    private func schemaWithEveryType() -> OwlQuestionnaireSchema {
-        OwlQuestionnaireSchema(version: 1, questions: [
-            .text(OwlQuestionnaireTextQuestion(
+    private func schemaWithEveryType() -> PulseQuestionnaireSchema {
+        PulseQuestionnaireSchema(version: 1, questions: [
+            .text(PulseQuestionnaireTextQuestion(
                 id: "t1", title: "What's on your mind?", subtitle: nil,
                 required: true, placeholder: nil, multiline: true
             )),
-            .singleChoice(OwlQuestionnaireSingleChoiceQuestion(
+            .singleChoice(PulseQuestionnaireSingleChoiceQuestion(
                 id: "s1", title: "Pick one", subtitle: nil, required: true,
                 options: [
-                    OwlQuestionnaireChoiceOption(id: "a", label: "A"),
-                    OwlQuestionnaireChoiceOption(id: "b", label: "B"),
+                    PulseQuestionnaireChoiceOption(id: "a", label: "A"),
+                    PulseQuestionnaireChoiceOption(id: "b", label: "B"),
                 ]
             )),
-            .multiChoice(OwlQuestionnaireMultiChoiceQuestion(
+            .multiChoice(PulseQuestionnaireMultiChoiceQuestion(
                 id: "m1", title: "Pick any", subtitle: nil, required: false,
                 options: [
-                    OwlQuestionnaireChoiceOption(id: "x", label: "X"),
-                    OwlQuestionnaireChoiceOption(id: "y", label: "Y"),
+                    PulseQuestionnaireChoiceOption(id: "x", label: "X"),
+                    PulseQuestionnaireChoiceOption(id: "y", label: "Y"),
                 ]
             )),
-            .rating(OwlQuestionnaireRatingQuestion(
+            .rating(PulseQuestionnaireRatingQuestion(
                 id: "r1", title: "Rate it", subtitle: nil, required: true, scale: 5
             )),
-            .nps(OwlQuestionnaireNpsQuestion(
+            .nps(PulseQuestionnaireNpsQuestion(
                 id: "n1", title: "How likely", subtitle: nil, required: false
             )),
         ])
     }
 
     func testEmptyStoreNothingAnswered() {
-        let store = OwlQuestionnaireAnswerStore()
+        let store = PulseQuestionnaireAnswerStore()
         for q in schemaWithEveryType().questions {
             XCTAssertFalse(store.isAnswered(q), "empty store should not satisfy \(q.id)")
         }
     }
 
     func testTextWhitespaceOnlyIsNotAnswered() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.text["t1"] = "   \n\t  "
         let q = schemaWithEveryType().questions.first { $0.id == "t1" }!
         XCTAssertFalse(store.isAnswered(q))
@@ -62,14 +62,14 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     }
 
     func testTextTrimmedAndCollected() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.text["t1"] = "  hello  "
         let collected = store.collected(schemaWithEveryType())
         XCTAssertEqual(collected["t1"], .text("hello"))
     }
 
     func testSingleChoiceAnsweredCollected() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.single["s1"] = "b"
         let q = schemaWithEveryType().questions.first { $0.id == "s1" }!
         XCTAssertTrue(store.isAnswered(q))
@@ -77,7 +77,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     }
 
     func testMultiChoiceEmptySetNotAnswered() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.multi["m1"] = []
         let q = schemaWithEveryType().questions.first { $0.id == "m1" }!
         XCTAssertFalse(store.isAnswered(q))
@@ -85,7 +85,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     }
 
     func testMultiChoiceCollectionSorted() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.multi["m1"] = ["y", "x"]
         let collected = store.collected(schemaWithEveryType())
         // Sorted for deterministic wire output across encoder runs.
@@ -93,7 +93,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     }
 
     func testRatingAndNpsCollected() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.rating["r1"] = 4
         store.nps["n1"] = 9
         let collected = store.collected(schemaWithEveryType())
@@ -102,7 +102,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     }
 
     func testHasAllRequiredFalseUntilAllRequiredAnswered() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         let schema = schemaWithEveryType()
         XCTAssertFalse(store.hasAllRequired(schema))
         store.text["t1"] = "ok"
@@ -114,7 +114,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     }
 
     func testOptionalQuestionsDoNotBlockHasAllRequired() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         let schema = schemaWithEveryType()
         store.text["t1"] = "hi"
         store.single["s1"] = "a"
@@ -126,7 +126,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     // MARK: - Resume / prefill
 
     func testPrefillHydratesEveryAnswerType() {
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.prefill(from: [
             "t1": .text("hello"),
             "s1": .choice("a"),
@@ -143,7 +143,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
 
     func testFirstUnansweredLandsOnFirstMissingRequiredOrOptional() {
         let schema = schemaWithEveryType()
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         // Nothing answered → land on index 0 (t1)
         XCTAssertEqual(store.firstUnansweredIndex(in: schema), 0)
         // Answer t1 → land on s1 (index 1)
@@ -157,7 +157,7 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
 
     func testFirstUnansweredLandsOnLastWhenAllAnswered() {
         let schema = schemaWithEveryType()
-        var store = OwlQuestionnaireAnswerStore()
+        var store = PulseQuestionnaireAnswerStore()
         store.prefill(from: [
             "t1": .text("hi"),
             "s1": .choice("a"),
@@ -175,13 +175,13 @@ final class OwlQuestionnaireFlowTests: XCTestCase {
     func testPublicViewCompilesWithAndWithoutConsent() {
         // Pure surface verification — if this compiles, the public init
         // signatures both still exist with the right defaults.
-        let q = OwlQuestionnaire(
+        let q = PulseQuestionnaire(
             id: "id", slug: "demo", name: "n", description: nil,
             schema: schemaWithEveryType()
         )
         #if canImport(SwiftUI) && !os(watchOS)
-        _ = OwlQuestionnaireView(questionnaire: q)
-        _ = OwlQuestionnaireView(questionnaire: q, showsConsent: true)
+        _ = PulseQuestionnaireView(questionnaire: q)
+        _ = PulseQuestionnaireView(questionnaire: q, showsConsent: true)
         #endif
         XCTAssertEqual(q.slug, "demo")
     }

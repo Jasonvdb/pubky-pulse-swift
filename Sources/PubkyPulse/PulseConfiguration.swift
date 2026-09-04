@@ -1,6 +1,6 @@
 import Foundation
 
-public struct OwlConfiguration: Sendable {
+public struct PulseConfiguration: Sendable {
     let endpoint: URL
     let apiKey: String
     let bundleId: String
@@ -22,7 +22,7 @@ public struct OwlConfiguration: Sendable {
         attributionEnabled: Bool = true
     ) throws {
         guard let bundleId = Self.resolveBundleId(), !bundleId.isEmpty else {
-            throw OwlConfigurationError.missingBundleId
+            throw PulseConfigurationError.missingBundleId
         }
         try self.init(
             endpoint: endpoint,
@@ -64,13 +64,13 @@ public struct OwlConfiguration: Sendable {
         attributionEnabled: Bool = true
     ) throws {
         guard let url = URL(string: endpoint) else {
-            throw OwlConfigurationError.invalidEndpoint(endpoint)
+            throw PulseConfigurationError.invalidEndpoint(endpoint)
         }
         guard apiKey.hasPrefix(Self.clientKeyPrefix) else {
-            throw OwlConfigurationError.invalidApiKey("API key must start with \"\(Self.clientKeyPrefix)\"")
+            throw PulseConfigurationError.invalidApiKey("API key must start with \"\(Self.clientKeyPrefix)\"")
         }
         guard !bundleId.isEmpty else {
-            throw OwlConfigurationError.missingBundleId
+            throw PulseConfigurationError.missingBundleId
         }
         self.endpoint = url
         self.apiKey = apiKey
@@ -83,7 +83,7 @@ public struct OwlConfiguration: Sendable {
     }
 }
 
-public enum OwlConfigurationError: LocalizedError {
+public enum PulseConfigurationError: LocalizedError {
     case invalidEndpoint(String)
     case invalidApiKey(String)
     case missingBundleId

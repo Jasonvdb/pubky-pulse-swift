@@ -4,12 +4,12 @@ struct LogEvent: Codable, Sendable {
     let clientEventId: String
     let sessionId: String
     var userId: String?
-    let level: OwlLogLevel
+    let level: PulseLogLevel
     let sourceModule: String?
     let message: String
     let screenName: String?
     let customAttributes: [String: String]?
-    let environment: OwlPlatform
+    let environment: PulsePlatform
     let osVersion: String?
     let appVersion: String?
     let sdkName: String?

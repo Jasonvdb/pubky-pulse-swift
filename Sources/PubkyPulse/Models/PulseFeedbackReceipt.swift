@@ -1,7 +1,7 @@
 import Foundation
 
 /// Wire format sent to `POST /v1/feedback`. Internal — public callers go
-/// through `Owl.sendFeedback(...)`.
+/// through `Pulse.sendFeedback(...)`.
 struct FeedbackRequestBody: Codable, Sendable {
     let bundle_id: String
     let message: String
@@ -25,7 +25,7 @@ struct FeedbackResponseBody: Codable, Sendable {
 }
 
 /// Confirmation returned by the server after feedback is accepted.
-public struct OwlFeedbackReceipt: Sendable, Equatable {
+public struct PulseFeedbackReceipt: Sendable, Equatable {
     public let id: String
     public let createdAt: Date
 
@@ -35,9 +35,9 @@ public struct OwlFeedbackReceipt: Sendable, Equatable {
     }
 }
 
-/// Errors thrown by `Owl.sendFeedback`.
-public enum OwlFeedbackError: Error, LocalizedError, Equatable {
-    /// `Owl.configure` has not been called yet.
+/// Errors thrown by `Pulse.sendFeedback`.
+public enum PulseFeedbackError: Error, LocalizedError, Equatable {
+    /// `Pulse.configure` has not been called yet.
     case notConfigured
     /// The message parameter was empty or only whitespace.
     case emptyMessage
@@ -49,7 +49,7 @@ public enum OwlFeedbackError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .notConfigured:
-            return "Owlmetry is not configured. Call Owl.configure(...) before sending feedback."
+            return "Pubky Pulse is not configured. Call Pulse.configure(...) before sending feedback."
         case .emptyMessage:
             return "Feedback message is empty."
         case .serverError(let code, let body):

@@ -5,8 +5,8 @@ import XCTest
 @testable import PubkyPulse
 
 /// Reproduction of the orphan-anon-user bug described in CLAUDE.md "Identity":
-/// `Owl.log()` spawns a Task that hops `DuplicateFilter` actor → `EventTransport`
-/// actor (two awaits). `Owl.setUser()` spawns a Task that goes straight to
+/// `Pulse.log()` spawns a Task that hops `DuplicateFilter` actor → `EventTransport`
+/// actor (two awaits). `Pulse.setUser()` spawns a Task that goes straight to
 /// `EventTransport.claimIdentity` (one await → flushAll → POST /v1/identity/claim).
 ///
 /// The setUser Task can win the race to `EventTransport` while the log Tasks
@@ -36,8 +36,8 @@ final class SetUserRaceTests: XCTestCase {
 
     override func setUp() async throws {
         try await super.setUp()
-        await Owl.reset()
-        Owl.clearUser(newAnonymousId: true)
+        await Pulse.reset()
+        Pulse.clearUser(newAnonymousId: true)
         IdentityManager.clearUserId()
         let tempQueue = OfflineQueue()
         await tempQueue.clear()
@@ -45,17 +45,17 @@ final class SetUserRaceTests: XCTestCase {
     }
 
     override func tearDown() async throws {
-        await Owl.shutdown()
+        await Pulse.shutdown()
         try await super.tearDown()
     }
 
-    /// The load-bearing assertion: after a burst of `Owl.log()` calls
-    /// followed immediately by `Owl.setUser(...)`, the claim POST must arrive
+    /// The load-bearing assertion: after a burst of `Pulse.log()` calls
+    /// followed immediately by `Pulse.setUser(...)`, the claim POST must arrive
     /// at the server *after* every ingest POST that carries one of those log
     /// events. If it doesn't, the server-side claim runs against an empty
     /// events table and the anon→real merge is lost.
     func testClaimPostIsIssuedAfterAllPriorIngestPosts() async throws {
-        try Owl.configure(
+        try Pulse.configure(
             endpoint: "https://\(Self.mockHost)",
             apiKey: "owl_client_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             bundleId: "com.owlmetry.test",
@@ -74,13 +74,13 @@ final class SetUserRaceTests: XCTestCase {
         // 30 events under the device's anon id. EventTransport batches at 20,
         // so we expect at least two ingest batches before flushAll drains.
         for i in 0..<30 {
-            Owl.info("burst_\(i)", screenName: "race")
+            Pulse.info("burst_\(i)", screenName: "race")
         }
 
         // No sleep — the bug is exactly that this fires before the log Tasks
         // have reached the EventTransport buffer.
         let realId = "race-real-user-\(UUID().uuidString.prefix(8))"
-        Owl.setUser(realId)
+        Pulse.setUser(realId)
 
         // Drive the in-flight Tasks to completion. shutdown() drains the
         // transport buffer, but we also need to wait for the claim Task that
@@ -91,7 +91,7 @@ final class SetUserRaceTests: XCTestCase {
         XCTAssertTrue(claimSeen, "claim POST never arrived within 8s — SDK never POSTed claim or mock not wired")
 
         // Drain anything still in flight.
-        await Owl.shutdown()
+        await Pulse.shutdown()
 
         // Give residual Tasks a moment to finalize so the snapshot is stable.
         try? await Task.sleep(nanoseconds: 200_000_000)

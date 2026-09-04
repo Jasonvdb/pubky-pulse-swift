@@ -1,9 +1,9 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-/// Internal gate view used by `.owlQuestionnaire(...)`. Evaluates the trigger
-/// + isEligible predicate against the persistent `OwlQuestionnaireState`
-/// snapshot, calls `Owl.fetchQuestionnaire(slug:)` if eligible, and presents
+/// Internal gate view used by `.pulseQuestionnaire(...)`. Evaluates the trigger
+/// + isEligible predicate against the persistent `PulseQuestionnaireState`
+/// snapshot, calls `Pulse.fetchQuestionnaire(slug:)` if eligible, and presents
 /// the sheet once the spec is loaded.
 ///
 /// **The sheet is attached to a hidden background subview, not the host's
@@ -16,16 +16,16 @@ import SwiftUI
 /// Uses `.sheet(item: $spec)` rather than `.sheet(isPresented: $showing)` so
 /// the spec is loaded atomically with the presentation flip — no two-`@State`
 /// render race where the sheet briefly opens with `spec == nil`.
-private struct OwlQuestionnaireGate: ViewModifier {
+private struct PulseQuestionnaireGate: ViewModifier {
     let slug: String
-    let trigger: OwlQuestionnaireTrigger
+    let trigger: PulseQuestionnaireTrigger
     let showsConsent: Bool
     let consentIcon: Image?
     let isEligible: (() -> Bool)?
     let forceShow: Bool
     let tint: Color?
-    let strings: OwlQuestionnaireStrings
-    let onSubmitted: ((OwlQuestionnaireReceipt) -> Void)?
+    let strings: PulseQuestionnaireStrings
+    let onSubmitted: ((PulseQuestionnaireReceipt) -> Void)?
     let onCancel: (() -> Void)?
     let onDismissed: (() -> Void)?
 
@@ -33,8 +33,8 @@ private struct OwlQuestionnaireGate: ViewModifier {
     /// questionnaire and any in-progress draft for resume. Identified by
     /// the questionnaire id (stable across the gate's lifetime).
     private struct PresentationPayload: Identifiable {
-        let questionnaire: OwlQuestionnaire
-        let inProgress: OwlQuestionnaireDraft?
+        let questionnaire: PulseQuestionnaire
+        let inProgress: PulseQuestionnaireDraft?
         var id: String { questionnaire.id }
     }
 
@@ -60,7 +60,7 @@ private struct OwlQuestionnaireGate: ViewModifier {
             .frame(width: 0, height: 0)
             .sheet(item: $payload) { payload in
                 NavigationStack {
-                    OwlQuestionnaireView(
+                    PulseQuestionnaireView(
                         questionnaire: payload.questionnaire,
                         inProgress: payload.inProgress,
                         // Resume on top of an existing draft means the user
@@ -93,19 +93,19 @@ private struct OwlQuestionnaireGate: ViewModifier {
         }
         hasEvaluated = true
         if !forceShow {
-            if Owl.questionnaireWasShownThisProcess(slug: slug) { return }
+            if Pulse.questionnaireWasShownThisProcess(slug: slug) { return }
             if trigger.isManual { return }
-            let snapshot = OwlQuestionnaireState.shared.snapshot()
+            let snapshot = PulseQuestionnaireState.shared.snapshot()
             guard trigger.isSatisfied(state: snapshot) else { return }
             if let isEligible, isEligible() == false { return }
         }
         do {
-            let result = try await Owl.fetchQuestionnaire(slug: slug, force: forceShow)
+            let result = try await Pulse.fetchQuestionnaire(slug: slug, force: forceShow)
             if let questionnaire = result.questionnaire {
                 // Skip the per-process "shown" mark under forceShow so the
                 // debug toggle stays re-presentable across dismiss cycles.
                 if !forceShow {
-                    Owl.markQuestionnaireShown(slug: slug)
+                    Pulse.markQuestionnaireShown(slug: slug)
                 }
                 payload = PresentationPayload(
                     questionnaire: questionnaire,
@@ -126,7 +126,7 @@ private extension View {
 }
 
 public extension View {
-    /// Gate a SwiftUI tree so it auto-presents an Owlmetry questionnaire when
+    /// Gate a SwiftUI tree so it auto-presents a Pubky Pulse questionnaire when
     /// the trigger's conditions hold and the user is eligible per server-side
     /// state (not already-responded, not globally-dismissed). The questionnaire
     /// must already exist on the server with the given slug — create it via
@@ -134,7 +134,7 @@ public extension View {
     ///
     /// All `trigger` conditions are ANDed:
     /// ```swift
-    /// .owlQuestionnaire(
+    /// .pulseQuestionnaire(
     ///     slug: "post-onboarding",
     ///     trigger: .when(
     ///         .launches(atLeast: 3),
@@ -154,7 +154,7 @@ public extension View {
     /// a hidden background subview, so it's safe to stack other `.sheet(...)`
     /// modifiers on the same view tree.
     ///
-    /// Use `OwlQuestionnaireView` directly for fully manual presentation.
+    /// Use `PulseQuestionnaireView` directly for fully manual presentation.
     ///
     /// Set `forceShow: true` to bypass every local gate (trigger conditions,
     /// `isEligible`, per-process dedup) and ask the server to also ignore
@@ -162,20 +162,20 @@ public extension View {
     /// respected. Intended for previewing the questionnaire UI in debug
     /// builds — gate it yourself with `#if DEBUG` or a debug-menu toggle so
     /// production users never trip it.
-    func owlQuestionnaire(
+    func pulseQuestionnaire(
         slug: String,
-        trigger: OwlQuestionnaireTrigger = .afterLaunch,
+        trigger: PulseQuestionnaireTrigger = .afterLaunch,
         showsConsent: Bool = true,
         consentIcon: Image? = Image(systemName: "quote.bubble.fill"),
         isEligible: (() -> Bool)? = nil,
         forceShow: Bool = false,
         tint: Color? = nil,
-        strings: OwlQuestionnaireStrings = .default,
-        onSubmitted: ((OwlQuestionnaireReceipt) -> Void)? = nil,
+        strings: PulseQuestionnaireStrings = .default,
+        onSubmitted: ((PulseQuestionnaireReceipt) -> Void)? = nil,
         onCancel: (() -> Void)? = nil,
         onDismissed: (() -> Void)? = nil
     ) -> some View {
-        modifier(OwlQuestionnaireGate(
+        modifier(PulseQuestionnaireGate(
             slug: slug,
             trigger: trigger,
             showsConsent: showsConsent,

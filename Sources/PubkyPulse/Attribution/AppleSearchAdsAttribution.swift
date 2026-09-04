@@ -18,11 +18,11 @@ import AdServices
 ///     responses across launches, give up (write `attribution_source="none"`)
 ///     to avoid retrying forever.
 ///
-/// All state is keyed by the current anonymous id so `Owl.clearUser(newAnonymousId: true)`
+/// All state is keyed by the current anonymous id so `Pulse.clearUser(newAnonymousId: true)`
 /// (new install-like state) naturally resets the capture gate.
 enum AppleSearchAdsAttribution {
 
-    private static let logger = Logger(subsystem: Owl.logSubsystem, category: "attribution.asa")
+    private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "attribution.asa")
 
     /// Maximum number of pending responses we'll chase across launches before
     /// giving up. Mirrors the server-side constant `ASA_MAX_PENDING_ATTEMPTS`.
@@ -30,15 +30,15 @@ enum AppleSearchAdsAttribution {
 
     private static let mockEnvVar = "OWLMETRY_MOCK_ADSERVICES_TOKEN"
 
-    // MARK: - Public entrypoint (called from Owl.configure auto-hook and from
-    // Owl.sendAppleSearchAdsAttributionToken)
+    // MARK: - Public entrypoint (called from Pulse.configure auto-hook and from
+    // Pulse.sendAppleSearchAdsAttributionToken)
 
     /// Attempt to capture attribution for the current install if not already
     /// captured. No-op if already done, disabled, or unsupported on this OS.
     ///
     /// `currentUserId` is a closure rather than a snapshot so callers can defer
     /// the read until after the token fetch completes — Firebase/auth flows
-    /// commonly resolve during that window and call `Owl.setUser(...)`, which
+    /// commonly resolve during that window and call `Pulse.setUser(...)`, which
     /// shifts `defaultUserId` from the anon id to the real id. Submitting with
     /// the stale anon id used to orphan the attribution props on a row the
     /// claim merge had already rewritten.
@@ -63,7 +63,7 @@ enum AppleSearchAdsAttribution {
         await submit(token: token, anonymousId: anonymousId, userId: currentUserId(), transport: transport)
     }
 
-    /// Submit a caller-supplied token. Used by `Owl.sendAppleSearchAdsAttributionToken(_:)`
+    /// Submit a caller-supplied token. Used by `Pulse.sendAppleSearchAdsAttributionToken(_:)`
     /// (custom flows / tests). Respects the capture cache: if we already
     /// captured for this anon, we still POST but don't bump the retry counter.
     ///
@@ -91,8 +91,8 @@ enum AppleSearchAdsAttribution {
         switch result {
         case .success(let attributionSource, _):
             logger.info("Attribution submitted successfully")
-            Owl.info("sdk:attribution_capture", attributes: [
-                "_network": OwlAttributionNetwork.appleSearchAds.slug,
+            Pulse.info("sdk:attribution_capture", attributes: [
+                "_network": PulseAttributionNetwork.appleSearchAds.slug,
                 "_outcome": "success",
                 "_attribution_source": attributionSource,
             ])
@@ -106,8 +106,8 @@ enum AppleSearchAdsAttribution {
                 let attempts = State.incrementPendingAttempts(anonymousId: anonymousId)
                 if attempts >= maxPendingAttempts {
                     logger.info("Attribution pending cap reached (\(attempts) attempts); giving up.")
-                    Owl.warn("sdk:attribution_capture", attributes: [
-                        "_network": OwlAttributionNetwork.appleSearchAds.slug,
+                    Pulse.warn("sdk:attribution_capture", attributes: [
+                        "_network": PulseAttributionNetwork.appleSearchAds.slug,
                         "_outcome": "gave_up",
                         "_attempts": String(attempts),
                     ])
@@ -115,8 +115,8 @@ enum AppleSearchAdsAttribution {
                     State.markCaptured(anonymousId: anonymousId)
                 } else {
                     logger.info("Attribution pending (attempt \(attempts)/\(maxPendingAttempts)); will retry on next launch.")
-                    Owl.info("sdk:attribution_capture", attributes: [
-                        "_network": OwlAttributionNetwork.appleSearchAds.slug,
+                    Pulse.info("sdk:attribution_capture", attributes: [
+                        "_network": PulseAttributionNetwork.appleSearchAds.slug,
                         "_outcome": "pending",
                         "_attempt": String(attempts),
                         "_max_attempts": String(maxPendingAttempts),
@@ -130,8 +130,8 @@ enum AppleSearchAdsAttribution {
             // for apps without ASA campaigns or in restricted regions, this
             // is the expected steady state, not a bug.
             logger.warning("Attribution token rejected as invalid; not retrying.")
-            Owl.warn("sdk:attribution_capture", attributes: [
-                "_network": OwlAttributionNetwork.appleSearchAds.slug,
+            Pulse.warn("sdk:attribution_capture", attributes: [
+                "_network": PulseAttributionNetwork.appleSearchAds.slug,
                 "_outcome": "invalid_token",
             ])
             return false
@@ -140,8 +140,8 @@ enum AppleSearchAdsAttribution {
                 State.clearCaptured(anonymousId: anonymousId)
             }
             logger.warning("Attribution transport failure; will retry on next launch.")
-            Owl.error("sdk:attribution_capture", attributes: [
-                "_network": OwlAttributionNetwork.appleSearchAds.slug,
+            Pulse.error("sdk:attribution_capture", attributes: [
+                "_network": PulseAttributionNetwork.appleSearchAds.slug,
                 "_outcome": "transport_failure",
             ])
             return false
@@ -188,8 +188,8 @@ enum AppleSearchAdsAttribution {
             return try AAAttribution.attributionToken()
         } catch {
             logger.warning("AAAttribution.attributionToken() failed: \(error.localizedDescription, privacy: .public)")
-            Owl.warn("sdk:attribution_capture", attributes: [
-                "_network": OwlAttributionNetwork.appleSearchAds.slug,
+            Pulse.warn("sdk:attribution_capture", attributes: [
+                "_network": PulseAttributionNetwork.appleSearchAds.slug,
                 "_outcome": "token_fetch_failed",
                 "_error": String(describing: error),
             ])
@@ -217,7 +217,7 @@ enum AppleSearchAdsAttribution {
 
 extension AppleSearchAdsAttribution {
     enum State {
-        private static let namespace = OwlAttributionNetwork.appleSearchAds.userDefaultsNamespace
+        private static let namespace = PulseAttributionNetwork.appleSearchAds.userDefaultsNamespace
 
         private static func capturedKey(anonymousId: String) -> String {
             "\(namespace).captured_for_anon_\(anonymousId)"

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Attribution networks supported by Owlmetry.
+/// Attribution networks supported by Pubky Pulse.
 ///
 /// Kept internal: the public Swift API is network-specific (each network has
 /// its own capture mechanism and data shape) so consumers never need to
@@ -9,7 +9,7 @@ import Foundation
 ///
 /// Adding a future network is a new case + a new capture file alongside
 /// `AppleSearchAdsAttribution.swift`.
-enum OwlAttributionNetwork: String {
+enum PulseAttributionNetwork: String {
     case appleSearchAds = "apple-search-ads"
     // Future: case meta = "meta"
     // Future: case googleAds = "google-ads"

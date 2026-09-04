@@ -10,7 +10,7 @@ import os
 /// Swizzling is one-time and permanent — event emission is controlled by `isEnabled`.
 final class URLSessionInstrumentation: @unchecked Sendable {
 
-    private static let logger = Logger(subsystem: Owl.logSubsystem, category: "network")
+    private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "network")
     private static var isInstalled = false
     private static var isEnabled = false
     /// Full URL prefixes for the SDK's own ingest and claim endpoints, used to filter them out.
@@ -171,15 +171,15 @@ final class URLSessionInstrumentation: @unchecked Sendable {
             let status = httpResponse.statusCode
             attrs["_http_status"] = String(status)
             if (200..<400).contains(status) {
-                Owl.debug("sdk:network_request", attributes: attrs)
+                Pulse.debug("sdk:network_request", attributes: attrs)
             } else {
-                Owl.warn("sdk:network_request", attributes: attrs)
+                Pulse.warn("sdk:network_request", attributes: attrs)
             }
         } else if let error {
             attrs["_http_error"] = String(describing: error)
-            Owl.error("sdk:network_request", attributes: attrs)
+            Pulse.error("sdk:network_request", attributes: attrs)
         } else {
-            Owl.info("sdk:network_request", attributes: attrs)
+            Pulse.info("sdk:network_request", attributes: attrs)
         }
     }
 

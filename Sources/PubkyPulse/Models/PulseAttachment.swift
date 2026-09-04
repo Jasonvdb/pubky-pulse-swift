@@ -1,7 +1,7 @@
 import Foundation
 
 /// A file to upload alongside an error event. See docs/concepts/attachments.
-public struct OwlAttachment: Sendable {
+public struct PulseAttachment: Sendable {
     public enum Source: Sendable {
         case fileURL(URL)
         case data(Data)

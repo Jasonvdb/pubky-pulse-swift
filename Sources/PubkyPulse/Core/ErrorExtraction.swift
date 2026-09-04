@@ -1,6 +1,6 @@
 import Foundation
 
-/// Extracts structured fields from a Swift `Error` for `Owl.error(_:Error)`.
+/// Extracts structured fields from a Swift `Error` for `Pulse.error(_:Error)`.
 /// Output is delivered as `_error_*` reserved custom attributes, which the
 /// server reads for issue fingerprinting (`_error_type` becomes the
 /// fingerprint discriminator) and dashboard display.
@@ -14,11 +14,11 @@ enum ErrorExtraction {
     }
 
     /// - Parameters:
-    ///   - error: the value passed to `Owl.error(_:Error)`.
+    ///   - error: the value passed to `Pulse.error(_:Error)`.
     ///   - userMessage: optional caller-provided context. When non-empty it is
     ///     used as the event message; otherwise we derive one from the error.
     ///   - callStack: result of `Thread.callStackSymbols` captured at the
-    ///     public `Owl.error` body (so SDK helper frames don't leak in).
+    ///     public `Pulse.error` body (so SDK helper frames don't leak in).
     static func extract(
         error: Error,
         userMessage: String?,

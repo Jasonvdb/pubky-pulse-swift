@@ -1,10 +1,10 @@
 // watchOS lacks .keyboardType / Material.bar; watch apps should call
-// Owl.sendFeedback() directly from their own UI.
+// Pulse.sendFeedback() directly from their own UI.
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
 /// Where the Submit (and Cancel) actions live.
-public enum OwlFeedbackActionsPlacement: Sendable {
+public enum PulseFeedbackActionsPlacement: Sendable {
     /// Render Submit / Cancel in the enclosing NavigationStack's toolbar.
     /// Use this for sheet and push presentations.
     case toolbar
@@ -14,7 +14,7 @@ public enum OwlFeedbackActionsPlacement: Sendable {
 }
 
 /// A reusable SwiftUI view that collects free-text feedback (plus optional name
-/// and email) and submits it to Owlmetry via `Owl.sendFeedback`.
+/// and email) and submits it to Pubky Pulse via `Pulse.sendFeedback`.
 ///
 /// The view does not set `.navigationTitle` or wrap itself in a `NavigationStack` —
 /// the host decides how to present it. Default actions placement is `.toolbar`,
@@ -30,18 +30,18 @@ public enum OwlFeedbackActionsPlacement: Sendable {
 /// // Sheet
 /// .sheet(isPresented: $show) {
 ///     NavigationStack {
-///         OwlFeedbackView(onCancel: { show = false })
+///         PulseFeedbackView(onCancel: { show = false })
 ///             .navigationTitle("Feedback")
 ///     }
 /// }
 ///
 /// // Pushed onto a NavigationStack
-/// NavigationLink("Feedback") { OwlFeedbackView() }
+/// NavigationLink("Feedback") { PulseFeedbackView() }
 ///
 /// // Embedded (no enclosing nav bar) — use .inline actions so Submit appears in-form
 /// VStack {
 ///     Text("Tell us what you think")
-///     OwlFeedbackView(showsContactFields: false, actionsPlacement: .inline)
+///     PulseFeedbackView(showsContactFields: false, actionsPlacement: .inline)
 /// }
 /// ```
 ///
@@ -52,7 +52,7 @@ public enum OwlFeedbackActionsPlacement: Sendable {
 /// can recolor them from the call site:
 ///
 /// ```swift
-/// OwlFeedbackView(onSubmitted: { _ in }, onCancel: {})
+/// PulseFeedbackView(onSubmitted: { _ in }, onCancel: {})
 ///     .tint(.orange)
 /// ```
 ///
@@ -62,14 +62,14 @@ public enum OwlFeedbackActionsPlacement: Sendable {
 ///
 /// ## Strings and localization
 ///
-/// Every user-facing string is overridable via `OwlFeedbackStrings`. Defaults
+/// Every user-facing string is overridable via `PulseFeedbackStrings`. Defaults
 /// ship via the SDK's bundled `Localizable.xcstrings` catalog. See
-/// `OwlFeedbackStrings.default.with(header:…)` for per-field overrides.
-public struct OwlFeedbackView: View {
+/// `PulseFeedbackStrings.default.with(header:…)` for per-field overrides.
+public struct PulseFeedbackView: View {
     private let showsContactFields: Bool
-    private let actionsPlacement: OwlFeedbackActionsPlacement
-    private let strings: OwlFeedbackStrings
-    private let onSubmitted: ((OwlFeedbackReceipt) -> Void)?
+    private let actionsPlacement: PulseFeedbackActionsPlacement
+    private let strings: PulseFeedbackStrings
+    private let onSubmitted: ((PulseFeedbackReceipt) -> Void)?
     private let onCancel: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
@@ -78,7 +78,7 @@ public struct OwlFeedbackView: View {
     @State private var name: String = ""
     @State private var email: String = ""
     @State private var isSubmitting: Bool = false
-    @State private var submitted: OwlFeedbackReceipt?
+    @State private var submitted: PulseFeedbackReceipt?
     @State private var errorMessage: String?
     @State private var showNoContactAlert: Bool = false
     @State private var showSuccessAlert: Bool = false
@@ -87,9 +87,9 @@ public struct OwlFeedbackView: View {
         name: String? = nil,
         email: String? = nil,
         showsContactFields: Bool = true,
-        actionsPlacement: OwlFeedbackActionsPlacement = .toolbar,
-        strings: OwlFeedbackStrings = .default,
-        onSubmitted: ((OwlFeedbackReceipt) -> Void)? = nil,
+        actionsPlacement: PulseFeedbackActionsPlacement = .toolbar,
+        strings: PulseFeedbackStrings = .default,
+        onSubmitted: ((PulseFeedbackReceipt) -> Void)? = nil,
         onCancel: (() -> Void)? = nil
     ) {
         self.showsContactFields = showsContactFields
@@ -111,7 +111,7 @@ public struct OwlFeedbackView: View {
                     if onCancel != nil {
                         ToolbarItem(placement: .cancellationAction) {
                             Button {
-                                OwlHaptics.tap()
+                                PulseHaptics.tap()
                                 onCancel?()
                             } label: {
                                 Text(strings.cancelButton)
@@ -125,7 +125,7 @@ public struct OwlFeedbackView: View {
                                 ProgressView()
                             } else {
                                 Button {
-                                    OwlHaptics.tap()
+                                    PulseHaptics.tap()
                                     onSubmitTapped()
                                 } label: {
                                     Text(strings.submitButton).fontWeight(.semibold)
@@ -138,7 +138,7 @@ public struct OwlFeedbackView: View {
             }
             .alert(Text(strings.errorTitle), isPresented: errorAlertBinding, actions: {
                 Button(role: .cancel) {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     errorMessage = nil
                 } label: { Text("OK") }
             }, message: {
@@ -146,12 +146,12 @@ public struct OwlFeedbackView: View {
             })
             .alert(Text(strings.noContactAlertTitle), isPresented: $showNoContactAlert, actions: {
                 Button(role: .destructive) {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     Task { await submit() }
                 } label: {
                     Text(strings.noContactSubmitAnyway)
                 }
-                Button(role: .cancel) { OwlHaptics.tap() } label: {
+                Button(role: .cancel) { PulseHaptics.tap() } label: {
                     Text(strings.noContactAddDetails)
                 }
             }, message: {
@@ -159,7 +159,7 @@ public struct OwlFeedbackView: View {
             })
             .alert(Text(strings.successTitle), isPresented: $showSuccessAlert, actions: {
                 Button(role: .cancel) {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     if let receipt = submitted {
                         onSubmitted?(receipt)
                     }
@@ -177,7 +177,7 @@ public struct OwlFeedbackView: View {
         if actionsPlacement == .inline, submitted == nil {
             VStack(spacing: 10) {
                 Button {
-                    OwlHaptics.tap()
+                    PulseHaptics.tap()
                     onSubmitTapped()
                 } label: {
                     HStack(spacing: 6) {
@@ -198,7 +198,7 @@ public struct OwlFeedbackView: View {
 
                 if let onCancel {
                     Button(role: .cancel) {
-                        OwlHaptics.tap()
+                        PulseHaptics.tap()
                         onCancel()
                     } label: {
                         Text(strings.cancelButton)
@@ -323,14 +323,14 @@ public struct OwlFeedbackView: View {
         defer { isSubmitting = false }
 
         do {
-            let receipt = try await Owl.sendFeedback(
+            let receipt = try await Pulse.sendFeedback(
                 message: trimmedMessage,
                 name: trimmedName.isEmpty ? nil : trimmedName,
                 email: trimmedEmail.isEmpty ? nil : trimmedEmail
             )
             submitted = receipt
             showSuccessAlert = true
-        } catch let error as OwlFeedbackError {
+        } catch let error as PulseFeedbackError {
             switch error {
             case .emptyMessage:
                 errorMessage = String(localized: strings.errorBlankMessage)
@@ -354,7 +354,7 @@ public struct OwlFeedbackView: View {
 
 #Preview {
     NavigationStack {
-        OwlFeedbackView(
+        PulseFeedbackView(
             onSubmitted: { _ in },
             onCancel: {}
         )

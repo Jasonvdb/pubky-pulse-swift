@@ -1,20 +1,20 @@
 import Foundation
 
 /// A complete questionnaire spec fetched from `GET /v1/questionnaires/:slug`.
-/// Public so consumers can render it manually via `OwlQuestionnaireView`.
-public struct OwlQuestionnaire: Sendable, Equatable, Identifiable {
+/// Public so consumers can render it manually via `PulseQuestionnaireView`.
+public struct PulseQuestionnaire: Sendable, Equatable, Identifiable {
     public let id: String
     public let slug: String
     public let name: String
     public let description: String?
-    public let schema: OwlQuestionnaireSchema
+    public let schema: PulseQuestionnaireSchema
 
     public init(
         id: String,
         slug: String,
         name: String,
         description: String?,
-        schema: OwlQuestionnaireSchema
+        schema: PulseQuestionnaireSchema
     ) {
         self.id = id
         self.slug = slug
@@ -24,27 +24,27 @@ public struct OwlQuestionnaire: Sendable, Equatable, Identifiable {
     }
 }
 
-public struct OwlQuestionnaireSchema: Sendable, Equatable {
+public struct PulseQuestionnaireSchema: Sendable, Equatable {
     public let version: Int
-    public let questions: [OwlQuestionnaireQuestion]
+    public let questions: [PulseQuestionnaireQuestion]
 
-    public init(version: Int, questions: [OwlQuestionnaireQuestion]) {
+    public init(version: Int, questions: [PulseQuestionnaireQuestion]) {
         self.version = version
         self.questions = questions
     }
 }
 
-public struct OwlQuestionnaireChoiceOption: Sendable, Equatable, Identifiable {
+public struct PulseQuestionnaireChoiceOption: Sendable, Equatable, Identifiable {
     public let id: String
     public let label: String
 }
 
-public enum OwlQuestionnaireQuestion: Sendable, Equatable, Identifiable {
-    case text(OwlQuestionnaireTextQuestion)
-    case singleChoice(OwlQuestionnaireSingleChoiceQuestion)
-    case multiChoice(OwlQuestionnaireMultiChoiceQuestion)
-    case rating(OwlQuestionnaireRatingQuestion)
-    case nps(OwlQuestionnaireNpsQuestion)
+public enum PulseQuestionnaireQuestion: Sendable, Equatable, Identifiable {
+    case text(PulseQuestionnaireTextQuestion)
+    case singleChoice(PulseQuestionnaireSingleChoiceQuestion)
+    case multiChoice(PulseQuestionnaireMultiChoiceQuestion)
+    case rating(PulseQuestionnaireRatingQuestion)
+    case nps(PulseQuestionnaireNpsQuestion)
 
     public var id: String {
         switch self {
@@ -87,7 +87,7 @@ public enum OwlQuestionnaireQuestion: Sendable, Equatable, Identifiable {
     }
 }
 
-public struct OwlQuestionnaireTextQuestion: Sendable, Equatable {
+public struct PulseQuestionnaireTextQuestion: Sendable, Equatable {
     public let id: String
     public let title: String
     public let subtitle: String?
@@ -96,23 +96,23 @@ public struct OwlQuestionnaireTextQuestion: Sendable, Equatable {
     public let multiline: Bool
 }
 
-public struct OwlQuestionnaireSingleChoiceQuestion: Sendable, Equatable {
+public struct PulseQuestionnaireSingleChoiceQuestion: Sendable, Equatable {
     public let id: String
     public let title: String
     public let subtitle: String?
     public let required: Bool
-    public let options: [OwlQuestionnaireChoiceOption]
+    public let options: [PulseQuestionnaireChoiceOption]
 }
 
-public struct OwlQuestionnaireMultiChoiceQuestion: Sendable, Equatable {
+public struct PulseQuestionnaireMultiChoiceQuestion: Sendable, Equatable {
     public let id: String
     public let title: String
     public let subtitle: String?
     public let required: Bool
-    public let options: [OwlQuestionnaireChoiceOption]
+    public let options: [PulseQuestionnaireChoiceOption]
 }
 
-public struct OwlQuestionnaireRatingQuestion: Sendable, Equatable {
+public struct PulseQuestionnaireRatingQuestion: Sendable, Equatable {
     public let id: String
     public let title: String
     public let subtitle: String?
@@ -120,7 +120,7 @@ public struct OwlQuestionnaireRatingQuestion: Sendable, Equatable {
     public let scale: Int  // V1: always 5
 }
 
-public struct OwlQuestionnaireNpsQuestion: Sendable, Equatable {
+public struct PulseQuestionnaireNpsQuestion: Sendable, Equatable {
     public let id: String
     public let title: String
     public let subtitle: String?
@@ -129,7 +129,7 @@ public struct OwlQuestionnaireNpsQuestion: Sendable, Equatable {
 
 /// Heterogeneous answer value. Wire encodes as the underlying type directly,
 /// not as a tagged union — the server validates against the schema.
-public enum OwlQuestionnaireAnswerValue: Sendable, Equatable {
+public enum PulseQuestionnaireAnswerValue: Sendable, Equatable {
     case text(String)
     case choice(String)         // option id
     case choices([String])      // option ids
@@ -142,7 +142,7 @@ public enum OwlQuestionnaireAnswerValue: Sendable, Equatable {
 /// `submitted_at` from null to non-null — used by the flow container to know
 /// whether to transition to the success phase. Subsequent draft-saves return
 /// `wasSubmitted = false`.
-public struct OwlQuestionnaireReceipt: Sendable, Equatable {
+public struct PulseQuestionnaireReceipt: Sendable, Equatable {
     public let id: String
     public let createdAt: Date
     public let wasSubmitted: Bool
@@ -157,30 +157,30 @@ public struct OwlQuestionnaireReceipt: Sendable, Equatable {
 /// An in-progress draft surfaced by `GET /v1/questionnaires/:slug` when the
 /// caller already has an unsubmitted response. The flow container reads this
 /// to pre-fill its answer store and skip to the first unanswered question.
-public struct OwlQuestionnaireDraft: Sendable, Equatable {
+public struct PulseQuestionnaireDraft: Sendable, Equatable {
     public let responseId: String
-    public let answers: [String: OwlQuestionnaireAnswerValue]
+    public let answers: [String: PulseQuestionnaireAnswerValue]
 
-    public init(responseId: String, answers: [String: OwlQuestionnaireAnswerValue]) {
+    public init(responseId: String, answers: [String: PulseQuestionnaireAnswerValue]) {
         self.responseId = responseId
         self.answers = answers
     }
 }
 
-/// Result of `Owl.fetchQuestionnaire(slug:)`. When `questionnaire` is non-nil
+/// Result of `Pulse.fetchQuestionnaire(slug:)`. When `questionnaire` is non-nil
 /// the questionnaire exists and is eligible to present; the `inProgress` field
 /// carries the existing draft (if any) so the flow container can resume.
 /// When `questionnaire` is nil, the questionnaire isn't eligible — typically
 /// `already_responded`, `globally_dismissed`, or `inactive`.
-public struct OwlQuestionnaireFetchResult: Sendable, Equatable {
-    public let questionnaire: OwlQuestionnaire?
-    public let inProgress: OwlQuestionnaireDraft?
-    public let ineligibleReason: OwlQuestionnaireIneligibleReason?
+public struct PulseQuestionnaireFetchResult: Sendable, Equatable {
+    public let questionnaire: PulseQuestionnaire?
+    public let inProgress: PulseQuestionnaireDraft?
+    public let ineligibleReason: PulseQuestionnaireIneligibleReason?
 
     public init(
-        questionnaire: OwlQuestionnaire?,
-        inProgress: OwlQuestionnaireDraft? = nil,
-        ineligibleReason: OwlQuestionnaireIneligibleReason? = nil
+        questionnaire: PulseQuestionnaire?,
+        inProgress: PulseQuestionnaireDraft? = nil,
+        ineligibleReason: PulseQuestionnaireIneligibleReason? = nil
     ) {
         self.questionnaire = questionnaire
         self.inProgress = inProgress
@@ -190,15 +190,15 @@ public struct OwlQuestionnaireFetchResult: Sendable, Equatable {
 
 /// Reason a questionnaire is not eligible to present right now. Mirrors the
 /// server's eligibility envelope.
-public enum OwlQuestionnaireIneligibleReason: String, Sendable {
+public enum PulseQuestionnaireIneligibleReason: String, Sendable {
     case alreadyResponded = "already_responded"
     case globallyDismissed = "globally_dismissed"
     case inactive = "inactive"
 }
 
-/// Errors surfaced by `Owl.fetchQuestionnaire` / `Owl.submitQuestionnaireResponse` /
-/// `Owl.dismissQuestionnaires`. Non-eligible fetches return `nil` instead of throwing.
-public enum OwlQuestionnaireError: Error, LocalizedError, Equatable, Sendable {
+/// Errors surfaced by `Pulse.fetchQuestionnaire` / `Pulse.submitQuestionnaireResponse` /
+/// `Pulse.dismissQuestionnaires`. Non-eligible fetches return `nil` instead of throwing.
+public enum PulseQuestionnaireError: Error, LocalizedError, Equatable, Sendable {
     case notConfigured
     case slugNotFound
     case invalidAnswers(String)
@@ -208,7 +208,7 @@ public enum OwlQuestionnaireError: Error, LocalizedError, Equatable, Sendable {
     public var errorDescription: String? {
         switch self {
         case .notConfigured:
-            return "Owlmetry is not configured. Call Owl.configure(...) first."
+            return "Pubky Pulse is not configured. Call Pulse.configure(...) first."
         case .slugNotFound:
             return "Questionnaire slug not found."
         case .invalidAnswers(let msg):
@@ -224,21 +224,21 @@ public enum OwlQuestionnaireError: Error, LocalizedError, Equatable, Sendable {
 
 // MARK: - Codable wire format
 
-extension OwlQuestionnaire: Codable {
+extension PulseQuestionnaire: Codable {
     private enum CodingKeys: String, CodingKey {
         case id, slug, name, description, schema
     }
 }
 
-extension OwlQuestionnaireSchema: Codable {
+extension PulseQuestionnaireSchema: Codable {
     private enum CodingKeys: String, CodingKey {
         case version, questions
     }
 }
 
-extension OwlQuestionnaireChoiceOption: Codable {}
+extension PulseQuestionnaireChoiceOption: Codable {}
 
-extension OwlQuestionnaireQuestion: Codable {
+extension PulseQuestionnaireQuestion: Codable {
     private enum CodingKeys: String, CodingKey { case type }
     private enum QuestionType: String, Codable {
         case text, single_choice, multi_choice, rating, nps
@@ -248,11 +248,11 @@ extension OwlQuestionnaireQuestion: Codable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let type = try c.decode(QuestionType.self, forKey: .type)
         switch type {
-        case .text:          self = .text(try OwlQuestionnaireTextQuestion(from: decoder))
-        case .single_choice: self = .singleChoice(try OwlQuestionnaireSingleChoiceQuestion(from: decoder))
-        case .multi_choice:  self = .multiChoice(try OwlQuestionnaireMultiChoiceQuestion(from: decoder))
-        case .rating:        self = .rating(try OwlQuestionnaireRatingQuestion(from: decoder))
-        case .nps:           self = .nps(try OwlQuestionnaireNpsQuestion(from: decoder))
+        case .text:          self = .text(try PulseQuestionnaireTextQuestion(from: decoder))
+        case .single_choice: self = .singleChoice(try PulseQuestionnaireSingleChoiceQuestion(from: decoder))
+        case .multi_choice:  self = .multiChoice(try PulseQuestionnaireMultiChoiceQuestion(from: decoder))
+        case .rating:        self = .rating(try PulseQuestionnaireRatingQuestion(from: decoder))
+        case .nps:           self = .nps(try PulseQuestionnaireNpsQuestion(from: decoder))
         }
     }
 
@@ -271,7 +271,7 @@ private protocol _TypedQuestion: Codable {
     func encodeWithType(to encoder: Encoder, type: String) throws
 }
 
-extension OwlQuestionnaireTextQuestion: _TypedQuestion {
+extension PulseQuestionnaireTextQuestion: _TypedQuestion {
     enum CodingKeys: String, CodingKey {
         case id, title, subtitle, required, placeholder, multiline, type
     }
@@ -297,7 +297,7 @@ extension OwlQuestionnaireTextQuestion: _TypedQuestion {
     }
 }
 
-extension OwlQuestionnaireSingleChoiceQuestion: _TypedQuestion {
+extension PulseQuestionnaireSingleChoiceQuestion: _TypedQuestion {
     enum CodingKeys: String, CodingKey { case id, title, subtitle, required, options, type }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -305,7 +305,7 @@ extension OwlQuestionnaireSingleChoiceQuestion: _TypedQuestion {
         title = try c.decode(String.self, forKey: .title)
         subtitle = try c.decodeIfPresent(String.self, forKey: .subtitle)
         required = try c.decode(Bool.self, forKey: .required)
-        options = try c.decode([OwlQuestionnaireChoiceOption].self, forKey: .options)
+        options = try c.decode([PulseQuestionnaireChoiceOption].self, forKey: .options)
     }
     public func encode(to encoder: Encoder) throws { try encodeWithType(to: encoder, type: "single_choice") }
     func encodeWithType(to encoder: Encoder, type: String) throws {
@@ -319,7 +319,7 @@ extension OwlQuestionnaireSingleChoiceQuestion: _TypedQuestion {
     }
 }
 
-extension OwlQuestionnaireMultiChoiceQuestion: _TypedQuestion {
+extension PulseQuestionnaireMultiChoiceQuestion: _TypedQuestion {
     enum CodingKeys: String, CodingKey { case id, title, subtitle, required, options, type }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -327,7 +327,7 @@ extension OwlQuestionnaireMultiChoiceQuestion: _TypedQuestion {
         title = try c.decode(String.self, forKey: .title)
         subtitle = try c.decodeIfPresent(String.self, forKey: .subtitle)
         required = try c.decode(Bool.self, forKey: .required)
-        options = try c.decode([OwlQuestionnaireChoiceOption].self, forKey: .options)
+        options = try c.decode([PulseQuestionnaireChoiceOption].self, forKey: .options)
     }
     public func encode(to encoder: Encoder) throws { try encodeWithType(to: encoder, type: "multi_choice") }
     func encodeWithType(to encoder: Encoder, type: String) throws {
@@ -341,7 +341,7 @@ extension OwlQuestionnaireMultiChoiceQuestion: _TypedQuestion {
     }
 }
 
-extension OwlQuestionnaireRatingQuestion: _TypedQuestion {
+extension PulseQuestionnaireRatingQuestion: _TypedQuestion {
     enum CodingKeys: String, CodingKey { case id, title, subtitle, required, scale, type }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -363,7 +363,7 @@ extension OwlQuestionnaireRatingQuestion: _TypedQuestion {
     }
 }
 
-extension OwlQuestionnaireNpsQuestion: _TypedQuestion {
+extension PulseQuestionnaireNpsQuestion: _TypedQuestion {
     enum CodingKeys: String, CodingKey { case id, title, subtitle, required, type }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -385,10 +385,10 @@ extension OwlQuestionnaireNpsQuestion: _TypedQuestion {
 
 // MARK: - Answer payload encoder
 
-/// Internal — encodes `[String: OwlQuestionnaireAnswerValue]` into the wire
+/// Internal — encodes `[String: PulseQuestionnaireAnswerValue]` into the wire
 /// shape (`Record<questionId, string | string[] | int>`).
-struct OwlQuestionnaireAnswersWire: Encodable {
-    let answers: [String: OwlQuestionnaireAnswerValue]
+struct PulseQuestionnaireAnswersWire: Encodable {
+    let answers: [String: PulseQuestionnaireAnswerValue]
 
     private struct DynamicKey: CodingKey {
         var stringValue: String
@@ -417,13 +417,13 @@ struct OwlQuestionnaireAnswersWire: Encodable {
 struct QuestionnaireFetchEnvelope: Decodable {
     let eligible: Bool
     let reason: String?
-    let questionnaire: OwlQuestionnaire?
+    let questionnaire: PulseQuestionnaire?
     let in_progress: QuestionnaireInProgressBody?
 }
 
 /// Wire-level representation of an in-progress draft as returned by the
 /// server's eligibility envelope. Answers are decoded as opaque JSON values
-/// here and projected back into `OwlQuestionnaireAnswerValue` keyed by the
+/// here and projected back into `PulseQuestionnaireAnswerValue` keyed by the
 /// question's type during flow-container hydration.
 struct QuestionnaireInProgressBody: Decodable {
     let response_id: String
@@ -432,7 +432,7 @@ struct QuestionnaireInProgressBody: Decodable {
 
 /// Minimal heterogeneous-JSON decoder for draft answers — supports the three
 /// shapes the server emits: string, array-of-string, integer. We can't
-/// decode straight into `OwlQuestionnaireAnswerValue` here because the value
+/// decode straight into `PulseQuestionnaireAnswerValue` here because the value
 /// type depends on the question type in the parent schema, which we hydrate
 /// against in the flow container.
 enum AnyAnswerJSON: Sendable {
@@ -467,7 +467,7 @@ struct QuestionnaireSubmitRequestBody: Encodable {
     let bundle_id: String
     let session_id: String?
     let user_id: String?
-    let answers: OwlQuestionnaireAnswersWire
+    let answers: PulseQuestionnaireAnswersWire
     /// false = save a draft, true = final submit (flips server-side
     /// submitted_at and fires the team notification exactly once).
     let is_complete: Bool

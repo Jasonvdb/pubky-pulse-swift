@@ -4,7 +4,7 @@ import os
 enum IdentityManager {
     static let anonymousIdPrefix = "owl_anon_"
 
-    private static let logger = Logger(subsystem: Owl.logSubsystem, category: "identity")
+    private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "identity")
 
     private static let keychainService = "com.owlmetry.sdk"
     private static let keychainAnonymousIdKey = "anonymousId"

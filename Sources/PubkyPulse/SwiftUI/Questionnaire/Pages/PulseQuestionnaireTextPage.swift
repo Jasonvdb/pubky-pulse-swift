@@ -1,8 +1,8 @@
 #if canImport(SwiftUI) && !os(watchOS)
 import SwiftUI
 
-struct OwlQuestionnaireTextPage: View {
-    let question: OwlQuestionnaireTextQuestion
+struct PulseQuestionnaireTextPage: View {
+    let question: PulseQuestionnaireTextQuestion
     @Binding var value: String
     // Container-owned focus so the keyboard tracks the current question across
     // TabView page swaps. TabView(.page) keeps neighbouring pages alive, so a

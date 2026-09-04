@@ -5,7 +5,7 @@ import UIKit
 #endif
 
 struct DeviceInfo: Sendable {
-    let platform: OwlPlatform
+    let platform: PulsePlatform
     let osVersion: String
     let appVersion: String?
     let buildNumber: String?
@@ -37,7 +37,7 @@ struct DeviceInfo: Sendable {
         )
     }
 
-    private static func detectPlatform() -> OwlPlatform {
+    private static func detectPlatform() -> PulsePlatform {
         #if os(macOS)
         return .macos
         #elseif os(watchOS)

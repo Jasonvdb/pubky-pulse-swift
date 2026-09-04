@@ -1,7 +1,7 @@
 import Foundation
 
 /// Assembles every outgoing `LogEvent` from the SDK. SDK identity
-/// (`sdk_name`, `sdk_version`) is stamped here from `OwlmetryVersion`
+/// (`sdk_name`, `sdk_version`) is stamped here from `PubkyPulseVersion`
 /// so consumers never need to set it on the call site.
 enum EventBuilder {
     static let systemMetaKeys: Set<String> = ["_file", "_function", "_line", "_connection"]
@@ -14,7 +14,7 @@ enum EventBuilder {
 
     static func build(
         message: String,
-        level: OwlLogLevel,
+        level: PulseLogLevel,
         screenName: String?,
         customAttributes: [String: String]?,
         userId: String?,
@@ -51,8 +51,8 @@ enum EventBuilder {
             environment: deviceInfo.platform,
             osVersion: deviceInfo.osVersion,
             appVersion: deviceInfo.appVersion,
-            sdkName: OwlmetryVersion.name,
-            sdkVersion: OwlmetryVersion.current,
+            sdkName: PubkyPulseVersion.name,
+            sdkVersion: PubkyPulseVersion.current,
             buildNumber: deviceInfo.buildNumber,
             deviceModel: deviceInfo.deviceModel,
             locale: deviceInfo.locale,
