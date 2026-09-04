@@ -1,17 +1,17 @@
 import SwiftUI
-import Owlmetry
+import PubkyPulse
 import WatchConnectivity
 
 @main
-struct OwlmetryDemoApp: App {
+struct PubkyPulseDemoApp: App {
     init() {
         do {
-            try Owl.configure(
+            try Pulse.configure(
                 endpoint: "http://localhost:4000",
-                apiKey: "owl_client_demo_000000000000000000000000000000000000000000"
+                apiKey: "pulse_client_demo_000000000000000000000000000000000000000000"
             )
         } catch {
-            print("Owlmetry configuration failed: \(error)")
+            print("Pubky Pulse configuration failed: \(error)")
         }
 
         // Receive events forwarded from the paired Apple Watch demo.
@@ -34,7 +34,7 @@ private final class WatchEventForwarder: NSObject, WCSessionDelegate {
     static let shared = WatchEventForwarder()
 
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
-        Owl.handleWatchUserInfo(userInfo)
+        Pulse.handleWatchUserInfo(userInfo)
     }
 
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {}

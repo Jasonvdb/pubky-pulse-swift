@@ -1,5 +1,5 @@
 import SwiftUI
-import Owlmetry
+import PubkyPulse
 
 struct ContentView: View {
     @State private var userId = ""
@@ -17,8 +17,8 @@ struct ContentView: View {
     @State private var questionnaireForceShow = false
     @State private var showQuestionnaireManually = false
     @State private var manualPresentationUsesConsent = true
-    @State private var manualQuestionnaire: OwlQuestionnaire?
-    @State private var manualQuestionnaireInProgress: OwlQuestionnaireDraft?
+    @State private var manualQuestionnaire: PulseQuestionnaire?
+    @State private var manualQuestionnaireInProgress: PulseQuestionnaireDraft?
     @State private var lastQuestionnaireId: String?
     @State private var lastDismissDate: Date?
 
@@ -37,8 +37,8 @@ struct ContentView: View {
                 backendDemoSection
                 logOutputSection
             }
-            .navigationTitle("Owlmetry Demo")
-            .owlQuestionnaire(
+            .navigationTitle("Pubky Pulse Demo")
+            .pulseQuestionnaire(
                 slug: questionnaireSlug,
                 trigger: .afterLaunch,
                 showsConsent: questionnaireShowsConsent,
@@ -59,7 +59,7 @@ struct ContentView: View {
             .sheet(isPresented: $showQuestionnaireManually) {
                 if let manualQuestionnaire {
                     NavigationStack {
-                        OwlQuestionnaireView(
+                        PulseQuestionnaireView(
                             questionnaire: manualQuestionnaire,
                             inProgress: manualQuestionnaireInProgress,
                             // Skip consent when resuming a draft — the user
@@ -85,7 +85,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showFeedbackSheet) {
                 NavigationStack {
-                    OwlFeedbackView(
+                    PulseFeedbackView(
                         name: userId.isEmpty ? nil : userId,
                         onSubmitted: { receipt in
                             lastFeedbackId = receipt.id
@@ -101,9 +101,9 @@ struct ContentView: View {
                 }
             }
         }
-        .owlScreen("Home")
+        .pulseScreen("Home")
         .onAppear {
-            Owl.recordMetric("demo_app_opened")
+            Pulse.recordMetric("demo_app_opened")
             appendLog("App opened — recorded demo_app_opened")
         }
     }
@@ -115,25 +115,25 @@ struct ContentView: View {
             TextField("Message", text: $logMessage)
 
             Button("Info") {
-                Owl.info(logMessage, screenName: "ContentView")
+                Pulse.info(logMessage, screenName: "ContentView")
                 appendLog("[INFO] \(logMessage)")
             }
             .tint(.blue)
 
             Button("Debug") {
-                Owl.debug(logMessage, screenName: "ContentView")
+                Pulse.debug(logMessage, screenName: "ContentView")
                 appendLog("[DEBUG] \(logMessage)")
             }
             .tint(.gray)
 
             Button("Warn") {
-                Owl.warn(logMessage, screenName: "ContentView")
+                Pulse.warn(logMessage, screenName: "ContentView")
                 appendLog("[WARN] \(logMessage)")
             }
             .tint(.orange)
 
             Button("Error") {
-                Owl.error(logMessage, screenName: "ContentView")
+                Pulse.error(logMessage, screenName: "ContentView")
                 appendLog("[ERROR] \(logMessage)")
             }
             .tint(.red)
@@ -150,12 +150,12 @@ struct ContentView: View {
 
             Button("Record Metric") {
                 let attrs: [String: String?] = customKey.isEmpty ? [:] : [customKey: customValue]
-                Owl.recordMetric("demo_custom_event", attributes: attrs)
+                Pulse.recordMetric("demo_custom_event", attributes: attrs)
                 appendLog("[METRIC] demo_custom_event \(attrs.description)")
             }
 
             Button("Simulate Conversion") {
-                let op = Owl.startOperation("photo-conversion", attributes: ["input_format": "heic"])
+                let op = Pulse.startOperation("photo-conversion", attributes: ["input_format": "heic"])
                 appendLog("[METRIC] photo-conversion:start")
                 Task {
                     try? await Task.sleep(for: .seconds(1))
@@ -166,7 +166,7 @@ struct ContentView: View {
             .tint(.green)
 
             Button("Simulate Failed Operation") {
-                let op = Owl.startOperation("photo-conversion", attributes: ["input_format": "raw"])
+                let op = Pulse.startOperation("photo-conversion", attributes: ["input_format": "raw"])
                 appendLog("[METRIC] photo-conversion:start")
                 op.fail(error: "unsupported_format")
                 appendLog("[METRIC] photo-conversion:fail")
@@ -179,12 +179,12 @@ struct ContentView: View {
                 // pass the actual file that failed to parse/convert.
                 let bytes: [UInt8] = Array("fake broken image bytes — demo only".utf8)
                 let fakeInput = Data(bytes)
-                Owl.error(
+                Pulse.error(
                     "photo conversion failed",
                     screenName: "ContentView",
                     attributes: ["input_format": "heic", "stage": "decode"],
                     attachments: [
-                        OwlAttachment(data: fakeInput, name: "broken-input.heic",
+                        PulseAttachment(data: fakeInput, name: "broken-input.heic",
                                       contentType: "image/heic"),
                     ]
                 )
@@ -199,25 +199,25 @@ struct ContentView: View {
     private var funnelDemoSection: some View {
         Section("Funnel Demo") {
             Button("1. Welcome Screen") {
-                Owl.step("welcome-screen")
+                Pulse.step("welcome-screen")
                 appendLog("[STEP] welcome-screen")
             }
             .tint(.purple)
 
             Button("2. Create Account") {
-                Owl.step("create-account")
+                Pulse.step("create-account")
                 appendLog("[STEP] create-account")
             }
             .tint(.purple)
 
             Button("3. Complete Profile") {
-                Owl.step("complete-profile")
+                Pulse.step("complete-profile")
                 appendLog("[STEP] complete-profile")
             }
             .tint(.purple)
 
             Button("4. First Post") {
-                Owl.step("first-post")
+                Pulse.step("first-post")
                 appendLog("[STEP] first-post")
             }
             .tint(.purple)
@@ -234,18 +234,18 @@ struct ContentView: View {
 
             Button("Set User") {
                 guard !userId.isEmpty else { return }
-                Owl.setUser(userId)
+                Pulse.setUser(userId)
                 appendLog("Set user: \(userId)")
             }
             .disabled(userId.isEmpty)
 
             Button("Clear User") {
-                Owl.clearUser()
+                Pulse.clearUser()
                 appendLog("Cleared user (kept anon ID)")
             }
 
             Button("Clear + New Anonymous ID") {
-                Owl.clearUser(newAnonymousId: true)
+                Pulse.clearUser(newAnonymousId: true)
                 appendLog("Cleared user + new anonymous ID")
             }
             .tint(.red)
@@ -264,7 +264,7 @@ struct ContentView: View {
                 .textInputAutocapitalization(.never)
             Button("Set Property") {
                 guard !customKey.isEmpty else { return }
-                Owl.setUserProperties([customKey: customValue])
+                Pulse.setUserProperties([customKey: customValue])
                 appendLog("[PROPS] \(customKey) = \(customValue.isEmpty ? "(deleted)" : customValue)")
                 customKey = ""
                 customValue = ""
@@ -272,7 +272,7 @@ struct ContentView: View {
             .disabled(customKey.isEmpty)
 
             Button("Set Demo Properties") {
-                Owl.setUserProperties([
+                Pulse.setUserProperties([
                     "plan": "premium",
                     "rc_subscriber": "true",
                     "rc_product": "monthly_pro",
@@ -285,13 +285,13 @@ struct ContentView: View {
 
     // MARK: - Attribution
 
-    /// Attribution is auto-captured on `Owl.configure()`. The controls here
+    /// Attribution is auto-captured on `Pulse.configure()`. The controls here
     /// are for poking at it in development: force a dev-mode submission
     /// without relying on AdServices, or clear the "captured" flag so the
     /// next app launch re-attempts capture.
     private var attributionSection: some View {
         Section("Attribution") {
-            Text("Auto-captures Apple Search Ads attribution on app launch. Set OWLMETRY_MOCK_ADSERVICES_TOKEN in the scheme to exercise the real code path in the simulator.")
+            Text("Auto-captures Apple Search Ads attribution on app launch. Set PULSE_MOCK_ADSERVICES_TOKEN in the scheme to exercise the real code path in the simulator.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -312,7 +312,7 @@ struct ContentView: View {
             .tint(.gray)
 
             Button("Reset Capture Flag") {
-                Owl.resetAppleSearchAdsAttributionCapture()
+                Pulse.resetAppleSearchAdsAttributionCapture()
                 appendLog("[ATTRIBUTION] reset capture flag; relaunch to re-attempt auto-capture")
             }
             .tint(.orange)
@@ -324,13 +324,13 @@ struct ContentView: View {
         guard let url = URL(string: "\(baseURL)/v1/identity/attribution/apple-search-ads") else {
             return "bad url"
         }
-        guard let currentUser = Owl.currentUserId else {
-            return "Owl not configured"
+        guard let currentUser = Pulse.currentUserId else {
+            return "Pulse not configured"
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer owl_client_demo_000000000000000000000000000000000000000000", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer pulse_client_demo_000000000000000000000000000000000000000000", forHTTPHeaderField: "Authorization")
         let body: [String: String] = [
             "user_id": currentUser,
             "attribution_token": "ignored-in-mock",
@@ -359,7 +359,7 @@ struct ContentView: View {
             .tint(.cyan)
 
             NavigationLink {
-                OwlFeedbackView(
+                PulseFeedbackView(
                     name: userId.isEmpty ? nil : userId,
                     onSubmitted: { receipt in
                         lastFeedbackId = receipt.id
@@ -376,7 +376,7 @@ struct ContentView: View {
 
             NavigationLink {
                 // Embedded usage: no nav toolbar of its own, so actions render inline.
-                OwlFeedbackView(
+                PulseFeedbackView(
                     showsContactFields: false,
                     actionsPlacement: .inline,
                     onSubmitted: { receipt in
@@ -434,7 +434,7 @@ struct ContentView: View {
             Button {
                 Task {
                     do {
-                        let date = try await Owl.dismissQuestionnaires()
+                        let date = try await Pulse.dismissQuestionnaires()
                         lastDismissDate = date
                         appendLog("[QUESTIONNAIRE] dismissed globally at \(date)")
                     } catch {
@@ -447,9 +447,9 @@ struct ContentView: View {
             .tint(.red)
 
             Button(role: .destructive) {
-                OwlQuestionnaireState.shared._debugReset()
-                Owl._debugClearShownQuestionnaires()
-                Owl.clearUser(newAnonymousId: true)
+                PulseQuestionnaireState.shared._debugReset()
+                Pulse._debugClearShownQuestionnaires()
+                Pulse.clearUser(newAnonymousId: true)
                 lastQuestionnaireId = nil
                 lastDismissDate = nil
                 appendLog("[QUESTIONNAIRE] full reset — fresh anon ID, counters cleared, in-process cache cleared")
@@ -459,9 +459,9 @@ struct ContentView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Launch count: \(Owl.launchCount)")
-                Text("Foreground count: \(Owl.foregroundCount)")
-                if let first = Owl.firstLaunchAt {
+                Text("Launch count: \(Pulse.launchCount)")
+                Text("Foreground count: \(Pulse.foregroundCount)")
+                if let first = Pulse.firstLaunchAt {
                     Text("First launch: \(first.formatted(date: .abbreviated, time: .standard))")
                 }
                 if let lastQuestionnaireId {
@@ -479,7 +479,7 @@ struct ContentView: View {
     @MainActor
     private func loadAndPresentQuestionnaire() async {
         do {
-            let result = try await Owl.fetchQuestionnaire(slug: questionnaireSlug)
+            let result = try await Pulse.fetchQuestionnaire(slug: questionnaireSlug)
             if let q = result.questionnaire {
                 manualQuestionnaire = q
                 manualQuestionnaireInProgress = result.inProgress
@@ -506,7 +506,7 @@ struct ContentView: View {
                 .autocorrectionDisabled()
 
             Button("Greet") {
-                Owl.recordMetric("backend_greet_tapped", attributes: ["name": greetName])
+                Pulse.recordMetric("backend_greet_tapped", attributes: ["name": greetName])
                 appendLog("[METRIC] backend_greet_tapped")
                 Task {
                     let result = await callBackend(
@@ -519,7 +519,7 @@ struct ContentView: View {
             .tint(.green)
 
             Button("Checkout (simulated failure)") {
-                Owl.recordMetric("backend_checkout_tapped", attributes: ["item": "Widget"])
+                Pulse.recordMetric("backend_checkout_tapped", attributes: ["item": "Widget"])
                 appendLog("[METRIC] backend_checkout_tapped")
                 Task {
                     let result = await callBackend(
@@ -562,15 +562,15 @@ struct ContentView: View {
         appendLog("— Full Demo Started —")
 
         // 1. iOS info event
-        Owl.info("Demo started", screenName: "ContentView")
+        Pulse.info("Demo started", screenName: "ContentView")
         appendLog("[INFO] Demo started")
 
         // 2. Record a metric
-        Owl.recordMetric("demo_full_test")
+        Pulse.recordMetric("demo_full_test")
         appendLog("[METRIC] demo_full_test")
 
         // 2b. Lifecycle metric
-        let op = Owl.startOperation("demo-operation")
+        let op = Pulse.startOperation("demo-operation")
         appendLog("[METRIC] demo-operation:start")
         try? await Task.sleep(for: .milliseconds(500))
         op.complete(attributes: ["result": "success"])
@@ -579,7 +579,7 @@ struct ContentView: View {
         // 3. Backend greet → 2 info events server-side
         let greetResult = await callBackend(
             path: "/api/greet",
-            body: ["name": "OwlBot"]
+            body: ["name": "PulseBot"]
         )
         appendLog("[BACKEND] greet: \(greetResult)")
 
@@ -594,22 +594,22 @@ struct ContentView: View {
         appendLog("[BACKEND] checkout: \(checkoutResult)")
 
         // 6. Funnel demo: simulate onboarding flow
-        Owl.step("welcome-screen")
+        Pulse.step("welcome-screen")
         appendLog("[STEP] welcome-screen")
         try? await Task.sleep(for: .milliseconds(300))
-        Owl.step("create-account")
+        Pulse.step("create-account")
         appendLog("[STEP] create-account")
         try? await Task.sleep(for: .milliseconds(300))
-        Owl.step("complete-profile")
+        Pulse.step("complete-profile")
         appendLog("[STEP] complete-profile")
 
         // 7. User properties
-        Owl.setUserProperties(["plan": "premium", "rc_subscriber": "true"])
+        Pulse.setUserProperties(["plan": "premium", "rc_subscriber": "true"])
         appendLog("[PROPS] plan=premium, rc_subscriber=true")
         try? await Task.sleep(for: .milliseconds(500))
 
         // 8. iOS error event for investigation
-        Owl.error("Simulated client crash", screenName: "ContentView")
+        Pulse.error("Simulated client crash", screenName: "ContentView")
         appendLog("[ERROR] Simulated client crash")
 
         appendLog("— Full Demo Complete —")
@@ -639,8 +639,8 @@ struct ContentView: View {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let sessionId = Owl.sessionId {
-            request.setValue(sessionId, forHTTPHeaderField: "X-Owl-Session-Id")
+        if let sessionId = Pulse.sessionId {
+            request.setValue(sessionId, forHTTPHeaderField: "X-Pulse-Session-Id")
         }
 
         let filtered = body.compactMapValues { $0 }
