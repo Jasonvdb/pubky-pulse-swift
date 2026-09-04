@@ -2,7 +2,7 @@
 #if os(macOS)
 import XCTest
 import CryptoKit
-@testable import Owlmetry
+@testable import PubkyPulse
 
 /// End-to-end tests that run against a real Owlmetry server with a real database.
 /// These require the server to be running at TEST_ENDPOINT with the test database seeded.

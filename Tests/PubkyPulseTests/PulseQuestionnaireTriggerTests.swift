@@ -1,5 +1,5 @@
 import XCTest
-@testable import Owlmetry
+@testable import PubkyPulse
 
 final class OwlQuestionnaireTriggerTests: XCTestCase {
     private func snapshot(

@@ -1,5 +1,5 @@
 import Foundation
-@testable import Owlmetry
+@testable import PubkyPulse
 
 extension LogEvent {
     static func stub(

@@ -1,5 +1,5 @@
 import XCTest
-@testable import Owlmetry
+@testable import PubkyPulse
 
 final class CustomAttributeTrimmerTests: XCTestCase {
     func testNilReturnsNil() {

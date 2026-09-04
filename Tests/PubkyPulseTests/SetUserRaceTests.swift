@@ -2,7 +2,7 @@
 // (matches SDKIntegrationTests.swift).
 #if os(macOS)
 import XCTest
-@testable import Owlmetry
+@testable import PubkyPulse
 
 /// Reproduction of the orphan-anon-user bug described in CLAUDE.md "Identity":
 /// `Owl.log()` spawns a Task that hops `DuplicateFilter` actor → `EventTransport`

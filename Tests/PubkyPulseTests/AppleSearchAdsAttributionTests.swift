@@ -1,5 +1,5 @@
 import XCTest
-@testable import Owlmetry
+@testable import PubkyPulse
 
 /// End-to-end Apple Search Ads attribution tests against a real Owlmetry
 /// server. Uses the server's `dev_mock` body field to bypass the upstream

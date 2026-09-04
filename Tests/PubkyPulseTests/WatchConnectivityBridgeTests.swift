@@ -1,5 +1,5 @@
 import XCTest
-@testable import Owlmetry
+@testable import PubkyPulse
 
 #if canImport(WatchConnectivity)
 import WatchConnectivity

@@ -1,5 +1,5 @@
 import XCTest
-@testable import Owlmetry
+@testable import PubkyPulse
 
 /// Covers the `[String: String?]` public API shape — callers can pass
 /// optional values directly and nils are silently dropped before the
