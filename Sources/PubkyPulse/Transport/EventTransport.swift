@@ -23,17 +23,31 @@ actor EventTransport {
     private let flushInterval: UInt64 = 5_000_000_000 // 5 seconds
     private let maxRetries = 5
     private let maxBackoff: TimeInterval = 30
+    private let maxRetryAfter: TimeInterval = 60
     private let compressionThreshold = 512
 
-    // In-flight `send(_:)` Tasks. `claimIdentity` waits for this counter to
-    // drain to zero before POSTing the claim — otherwise the auto-flush from
-    // `enqueue` (when buffer reaches batchSize) and `flushAll`'s loop body
-    // can have parallel /v1/ingest POSTs in flight on separate URLSession
-    // connections, and the server can process the claim's `UPDATE events`
-    // before those parallel ingests have committed → events orphan under the
-    // anon id.
-    private var inFlightSendCount: Int = 0
+    // Batches currently inside `send(_:)`: already removed from `buffer`,
+    // not yet delivered. Two things depend on them.
+    //
+    // `claimIdentity` waits for this to drain before POSTing the claim —
+    // otherwise the auto-flush from `enqueue` (when buffer reaches
+    // batchSize) and `flushAll`'s loop body can have parallel /v1/ingest
+    // POSTs in flight on separate URLSession connections, and the server can
+    // process the claim's `UPDATE events` before those parallel ingests have
+    // committed → events orphan under the anon id.
+    //
+    // `persistBufferToDisk` parks their events too, so a batch asleep in the
+    // retry ladder when the OS suspends or kills us isn't lost.
+    private var inFlightBatches: [Int: InFlightBatch] = [:]
+    private var nextInFlightBatchId = 0
     private var sendDrainContinuations: [CheckedContinuation<Void, Never>] = []
+
+    private struct InFlightBatch {
+        let events: [LogEvent]
+        /// Set by `persistBufferToDisk()`. The still-running `send(_:)` reads
+        /// it so a delivery that later fails doesn't park a second copy.
+        var persisted = false
+    }
 
     private static let logger = Logger(subsystem: Pulse.logSubsystem, category: "transport")
 
@@ -124,8 +138,8 @@ actor EventTransport {
             return
         }
 
-        let success = await send(batch)
-        if !success {
+        let handled = await send(batch)
+        if !handled {
             await handleUndelivered(batch)
         }
     }
@@ -147,8 +161,8 @@ actor EventTransport {
                 return
             }
 
-            let success = await send(batch)
-            if !success {
+            let handled = await send(batch)
+            if !handled {
                 await handleUndelivered(batch)
             }
         }
@@ -168,10 +182,26 @@ actor EventTransport {
         await offlineQueue.enqueue(batch)
     }
 
+    /// Park everything undelivered on disk. Called when background time
+    /// expires or the app is terminating, so it covers the batches inside
+    /// `send(_:)` as well as `buffer` — a retry ladder can sleep far longer
+    /// than the OS gives us before suspending or killing the process. A
+    /// parked batch whose POST later succeeds is delivered twice; ingest
+    /// deduplicates on `client_event_id`, and losing it is not recoverable.
     func persistBufferToDisk() async {
-        guard !buffer.isEmpty else { return }
-        await offlineQueue.enqueue(buffer)
+        // In-flight batches left `buffer` before the ones still in it, so
+        // they go in front to keep disk order matching emission order.
+        let inFlightIds = inFlightBatches.keys.sorted()
+        var pending = inFlightIds.flatMap { inFlightBatches[$0]?.events ?? [] }
+        pending.append(contentsOf: buffer)
+        guard !pending.isEmpty else { return }
+
+        // Mark before the first await so the in-flight sends see it whenever
+        // they next reach the actor.
+        for id in inFlightIds { inFlightBatches[id]?.persisted = true }
         buffer.removeAll()
+
+        await offlineQueue.enqueue(pending)
         await offlineQueue.persistNow()
     }
 
@@ -259,7 +289,7 @@ actor EventTransport {
             do {
                 let (data, response) = try await session.data(for: request)
                 guard let http = response as? HTTPURLResponse else {
-                    if attempt < maxRetries - 1 { await sleepBackoff(attempt: attempt) }
+                    if attempt < maxRetries - 1 { await sleepBeforeRetry(attempt: attempt) }
                     continue
                 }
 
@@ -288,16 +318,21 @@ actor EventTransport {
             }
 
             if attempt < maxRetries - 1 {
-                await sleepBackoff(attempt: attempt)
+                await sleepBeforeRetry(attempt: attempt)
             }
         }
 
         return .transportFailure
     }
 
-    private func sleepBackoff(attempt: Int) async {
+    /// Exponential backoff (1s, 2s, 4s … capped at `maxBackoff`), widened to
+    /// the server's `Retry-After` when it asked for a longer wait and capped
+    /// at `maxRetryAfter` so a single hint can't hold a batch in memory for
+    /// minutes.
+    private func sleepBeforeRetry(attempt: Int, retryAfter: TimeInterval? = nil) async {
         let backoff = min(pow(2.0, Double(attempt)), maxBackoff)
-        try? await Task.sleep(nanoseconds: UInt64(backoff * 1_000_000_000))
+        let delay = retryAfter.map { min(max($0, backoff), maxRetryAfter) } ?? backoff
+        try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
     }
 
     /// One-shot synchronous feedback submission. Does NOT queue offline — caller handles errors.
@@ -499,6 +534,10 @@ actor EventTransport {
         return f
     }()
 
+    /// POST one batch to /v1/ingest. Returns `true` when the caller need not
+    /// park the batch: either the POST succeeded, or `persistBufferToDisk()`
+    /// already wrote the batch to the offline queue while the retry ladder
+    /// was sleeping.
     private func send(_ events: [LogEvent]) async -> Bool {
         guard let httpBody = try? encoder.encode(IngestRequestBody(bundle_id: bundleId, events: events)) else {
             Self.logger.error("Failed to encode events")
@@ -506,16 +545,20 @@ actor EventTransport {
         }
 
         let request = makeRequest(url: ingestURL, body: httpBody)
-        inFlightSendCount += 1
+        let batchId = nextInFlightBatchId
+        nextInFlightBatchId += 1
+        inFlightBatches[batchId] = InFlightBatch(events: events)
         defer {
-            inFlightSendCount -= 1
-            if inFlightSendCount == 0 {
+            inFlightBatches[batchId] = nil
+            if inFlightBatches.isEmpty {
                 let waiters = sendDrainContinuations
                 sendDrainContinuations = []
                 for waiter in waiters { waiter.resume() }
             }
         }
-        return await performWithRetry(request, label: "Ingest")
+
+        let delivered = await performWithRetry(request, label: "Ingest", batchId: batchId)
+        return delivered || inFlightBatches[batchId]?.persisted == true
     }
 
     /// Suspend until every in-flight ingest send has returned (HTTP response
@@ -525,13 +568,13 @@ actor EventTransport {
     /// otherwise the server's `UPDATE events` could run while those parallel
     /// ingest POSTs are mid-transaction and miss their rows.
     private func awaitInFlightSends() async {
-        if inFlightSendCount == 0 { return }
+        if inFlightBatches.isEmpty { return }
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             // Re-check inside the actor (we're already on it, but be explicit
             // about the invariant: by the time this closure runs, no other
             // actor message has interleaved between the count check and the
             // append).
-            if inFlightSendCount == 0 {
+            if inFlightBatches.isEmpty {
                 continuation.resume()
             } else {
                 sendDrainContinuations.append(continuation)
@@ -558,8 +601,12 @@ actor EventTransport {
         return request
     }
 
-    private func performWithRetry(_ request: URLRequest, label: String) async -> Bool {
+    /// Retry ladder shared by ingest, claim and properties. Pass `batchId`
+    /// for an ingest so the ladder can bail out once the batch is durable.
+    private func performWithRetry(_ request: URLRequest, label: String, batchId: Int? = nil) async -> Bool {
         for attempt in 0..<maxRetries {
+            var retryAfter: TimeInterval?
+
             do {
                 let (data, response) = try await session.data(for: request)
 
@@ -572,10 +619,18 @@ actor EventTransport {
                         return true
                     }
 
-                    // Don't retry client errors — they won't succeed
-                    if (400..<500).contains(http.statusCode) {
+                    // Don't retry client errors — they won't succeed. 429 is
+                    // the exception: it's a rate limit, so the same payload
+                    // does land once the window moves.
+                    if (400..<500).contains(http.statusCode), http.statusCode != 429 {
                         Self.logger.warning("\(label) returned \(http.statusCode), not retrying")
                         return false
+                    }
+
+                    // Only 429 and 503 define a `Retry-After`; elsewhere keep
+                    // the plain ladder.
+                    if http.statusCode == 429 || http.statusCode == 503 {
+                        retryAfter = Self.retryAfterSeconds(http)
                     }
 
                     Self.logger.warning("\(label) returned \(http.statusCode), attempt \(attempt + 1)/\(self.maxRetries)")
@@ -584,14 +639,44 @@ actor EventTransport {
                 Self.logger.warning("\(label) failed: \(error.localizedDescription), attempt \(attempt + 1)/\(self.maxRetries)")
             }
 
-            if attempt < maxRetries - 1 {
-                let backoff = min(pow(2.0, Double(attempt)), maxBackoff)
-                try? await Task.sleep(nanoseconds: UInt64(backoff * 1_000_000_000))
+            guard attempt < maxRetries - 1 else { break }
+
+            // The batch was parked to the offline queue while we were
+            // retrying (background time expiring, or termination). It's
+            // durable now, so stop spending the runtime we have left — the
+            // next flush picks it up off disk.
+            if let batchId, inFlightBatches[batchId]?.persisted == true {
+                Self.logger.info("\(label) abandoned: batch already parked to the offline queue")
+                return false
             }
+
+            await sleepBeforeRetry(attempt: attempt, retryAfter: retryAfter)
         }
 
         return false
     }
+
+    /// Parse a `Retry-After` header: delta-seconds ("2") or an HTTP-date
+    /// ("Wed, 21 Oct 2026 07:28:00 GMT"). Returns nil when the header is
+    /// absent or unparsable so the caller falls back to the plain ladder.
+    private static func retryAfterSeconds(_ http: HTTPURLResponse) -> TimeInterval? {
+        guard let raw = http.value(forHTTPHeaderField: "Retry-After")?
+            .trimmingCharacters(in: .whitespaces), !raw.isEmpty else { return nil }
+
+        if let seconds = TimeInterval(raw), seconds.isFinite {
+            return max(0, seconds)
+        }
+        guard let date = Self.httpDate.date(from: raw) else { return nil }
+        return max(0, date.timeIntervalSinceNow)
+    }
+
+    private static let httpDate: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: "GMT")
+        f.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        return f
+    }()
 }
 
 private struct IngestResponse: Codable {
