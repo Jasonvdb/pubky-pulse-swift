@@ -191,7 +191,12 @@ actor EventTransport {
     func persistBufferToDisk() async {
         // In-flight batches left `buffer` before the ones still in it, so
         // they go in front to keep disk order matching emission order.
-        let inFlightIds = inFlightBatches.keys.sorted()
+        // Skip the ones an earlier call already parked: the offline queue
+        // does not deduplicate, so a second copy would eat its cap and
+        // evict older events.
+        let inFlightIds = inFlightBatches.keys.sorted().filter {
+            inFlightBatches[$0]?.persisted == false
+        }
         var pending = inFlightIds.flatMap { inFlightBatches[$0]?.events ?? [] }
         pending.append(contentsOf: buffer)
         guard !pending.isEmpty else { return }

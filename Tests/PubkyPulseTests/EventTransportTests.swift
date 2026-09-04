@@ -176,6 +176,36 @@ final class EventTransportTests: XCTestCase {
         XCTAssertEqual(drained.first?.message, "in-flight")
     }
 
+    func testRepeatedPersistDuringRetryParksInFlightBatchOnlyOnce() async {
+        let attempts = AttemptCounter()
+        MockURLProtocol.handler = { request in
+            _ = attempts.increment()
+            let response = HTTPURLResponse(url: request.url!, statusCode: 503, httpVersion: nil, headerFields: nil)!
+            return (response, Data())
+        }
+
+        let queue = OfflineQueue(directory: tempDir)
+        let transport = makeTransport(offlineQueue: queue)
+        await transport.enqueue(LogEvent.stub(message: "in-flight"))
+
+        let flush = Task { await transport.flush() }
+        await waitUntil { attempts.count >= 1 }
+
+        // Backgrounding twice while the same batch sleeps in the retry ladder
+        // must not park it twice: the offline queue does not deduplicate, so
+        // copies eat its cap and evict unrelated older events.
+        await transport.persistBufferToDisk()
+        await transport.persistBufferToDisk()
+        let parkedWhileInFlight = await queue.count
+        XCTAssertEqual(parkedWhileInFlight, 1, "a second persist must not park another copy")
+
+        await flush.value
+
+        let drained = await queue.drain()
+        XCTAssertEqual(drained.count, 1, "the batch must be parked exactly once")
+        XCTAssertEqual(drained.first?.message, "in-flight")
+    }
+
     // MARK: - Helpers
 
     /// Poll the actor-free `condition` until it holds, so tests don't race
