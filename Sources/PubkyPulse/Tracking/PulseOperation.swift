@@ -1,0 +1,61 @@
+import Foundation
+
+/// Tracks a metric operation lifecycle (start → complete/fail/cancel).
+/// Created by `Pulse.startOperation()` — do not instantiate directly.
+public final class PulseOperation: Sendable {
+    public let trackingId: String
+    let metric: String
+    let startTime: ContinuousClock.Instant
+
+    init(metric: String) {
+        self.trackingId = UUID().uuidString
+        self.metric = metric
+        self.startTime = ContinuousClock.now
+    }
+
+    /// Complete the operation successfully. Auto-adds duration_ms.
+    public func complete(
+        attributes: [String: String?] = [:],
+        file: String = #file,
+        function: String = #function,
+        line: Int = #line
+    ) {
+        var attrs: [String: String?] = attributes
+        attrs["tracking_id"] = trackingId
+        attrs["duration_ms"] = String(durationMs())
+        Pulse.info("metric:\(metric):complete", attributes: attrs, file: file, function: function, line: line)
+    }
+
+    /// Record a failed operation. Auto-adds duration_ms + error.
+    public func fail(
+        error: String,
+        attributes: [String: String?] = [:],
+        file: String = #file,
+        function: String = #function,
+        line: Int = #line
+    ) {
+        var attrs: [String: String?] = attributes
+        attrs["tracking_id"] = trackingId
+        attrs["duration_ms"] = String(durationMs())
+        attrs["error"] = error
+        Pulse.error("metric:\(metric):fail", attributes: attrs, file: file, function: function, line: line)
+    }
+
+    /// Cancel the operation. Auto-adds duration_ms.
+    public func cancel(
+        attributes: [String: String?] = [:],
+        file: String = #file,
+        function: String = #function,
+        line: Int = #line
+    ) {
+        var attrs: [String: String?] = attributes
+        attrs["tracking_id"] = trackingId
+        attrs["duration_ms"] = String(durationMs())
+        Pulse.info("metric:\(metric):cancel", attributes: attrs, file: file, function: function, line: line)
+    }
+
+    private func durationMs() -> Int {
+        let elapsed = ContinuousClock.now - startTime
+        return Int(elapsed.components.seconds * 1000 + elapsed.components.attoseconds / 1_000_000_000_000_000)
+    }
+}

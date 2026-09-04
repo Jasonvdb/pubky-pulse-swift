@@ -3,22 +3,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "Owlmetry",
+    name: "PubkyPulse",
     platforms: [
         .iOS(.v16),
         .macOS(.v13),
         .watchOS(.v10),
     ],
     products: [
-        .library(name: "Owlmetry", targets: ["Owlmetry"]),
+        .library(name: "PubkyPulse", targets: ["PubkyPulse"]),
     ],
     targets: [
         .target(
-            name: "Owlmetry",
+            name: "PubkyPulse",
             resources: [
                 .process("Resources"),
             ]
         ),
-        .testTarget(name: "OwlmetryTests", dependencies: ["Owlmetry"]),
+        .testTarget(name: "PubkyPulseTests", dependencies: ["PubkyPulse"]),
     ]
 )

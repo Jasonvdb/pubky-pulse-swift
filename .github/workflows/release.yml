@@ -17,11 +17,11 @@ jobs:
     name: Wait for Test workflow
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for unit + integration
+      - name: Wait for unit tests
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
           ref: ${{ github.sha }}
-          check-regexp: "(Unit tests|Integration tests)"
+          check-regexp: "Unit tests"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 20
           allowed-conclusions: success
@@ -74,12 +74,12 @@ jobs:
         env:
           NEXT: ${{ steps.ver.outputs.next }}
         run: |
-          # Strip leading "v" — OwlmetryVersion.current is plain semver.
+          # Strip leading "v" — PubkyPulseVersion.current is plain semver.
           version="${NEXT#v}"
-          file="Sources/Owlmetry/Core/OwlmetryVersion.swift"
+          file="Sources/PubkyPulse/Core/PubkyPulseVersion.swift"
           sed -i -E "s/(public static let current = )\"[^\"]*\"/\1\"$version\"/" "$file"
           if git diff --quiet "$file"; then
-            echo "OwlmetryVersion.current already at $version — no change."
+            echo "PubkyPulseVersion.current already at $version — no change."
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

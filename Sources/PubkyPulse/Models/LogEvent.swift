@@ -1,0 +1,52 @@
+import Foundation
+
+struct LogEvent: Codable, Sendable {
+    let clientEventId: String
+    let sessionId: String
+    var userId: String?
+    let level: PulseLogLevel
+    let sourceModule: String?
+    let message: String
+    let screenName: String?
+    let customAttributes: [String: String]?
+    let environment: PulsePlatform
+    let osVersion: String?
+    let appVersion: String?
+    let sdkName: String?
+    let sdkVersion: String?
+    let buildNumber: String?
+    let deviceModel: String?
+    let locale: String?
+    let preferredLanguage: String?
+    let supportedLanguages: [String]?
+    let isDev: Bool
+    let timestamp: String
+
+    enum CodingKeys: String, CodingKey {
+        case clientEventId = "client_event_id"
+        case sessionId = "session_id"
+        case userId = "user_id"
+        case level
+        case sourceModule = "source_module"
+        case message
+        case screenName = "screen_name"
+        case customAttributes = "custom_attributes"
+        case environment
+        case osVersion = "os_version"
+        case appVersion = "app_version"
+        case sdkName = "sdk_name"
+        case sdkVersion = "sdk_version"
+        case buildNumber = "build_number"
+        case deviceModel = "device_model"
+        case locale
+        case preferredLanguage = "preferred_language"
+        case supportedLanguages = "supported_languages"
+        case isDev = "is_dev"
+        case timestamp
+    }
+}
+
+struct IngestRequestBody: Codable, Sendable {
+    let bundle_id: String
+    let events: [LogEvent]
+}
