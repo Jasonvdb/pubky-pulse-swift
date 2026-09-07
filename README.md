@@ -1,7 +1,7 @@
 # Pubky Pulse Swift SDK
 
-[![Tests](https://github.com/pubky/pubky-pulse-swift/actions/workflows/test.yml/badge.svg)](https://github.com/pubky/pubky-pulse-swift/actions/workflows/test.yml)
-[![Release](https://img.shields.io/github/v/release/pubky/pubky-pulse-swift?display_name=tag&sort=semver)](https://github.com/pubky/pubky-pulse-swift/releases/latest)
+[![Tests](https://github.com/Jasonvdb/pubky-pulse-swift/actions/workflows/test.yml/badge.svg)](https://github.com/Jasonvdb/pubky-pulse-swift/actions/workflows/test.yml)
+[![Release](https://img.shields.io/github/v/release/Jasonvdb/pubky-pulse-swift?display_name=tag&sort=semver)](https://github.com/Jasonvdb/pubky-pulse-swift/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Platforms](https://img.shields.io/badge/platforms-iOS%2016%2B%20%7C%20macOS%2013%2B%20%7C%20watchOS%2010%2B-lightgrey)](./Package.swift)
 
@@ -17,17 +17,17 @@ Part of the [Pubky Pulse](https://pulse.pubky.org) self-hosted metrics platform.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/pubky/pubky-pulse-swift.git", branch: "main"),
+    .package(url: "https://github.com/Jasonvdb/pubky-pulse-swift.git", branch: "main"),
 ]
 ```
 
 Add `PubkyPulse` to your target's `dependencies`.
 
-> For stable releases, pin to a version instead: `.package(url: "…", from: "X.Y.Z")`. See [releases](https://github.com/pubky/pubky-pulse-swift/releases/latest) for the latest.
+> For stable releases, pin to a version instead: `.package(url: "…", from: "X.Y.Z")`. See [releases](https://github.com/Jasonvdb/pubky-pulse-swift/releases/latest) for the latest.
 
 ### Xcode
 
-`File` → `Add Package Dependencies…` → enter `https://github.com/pubky/pubky-pulse-swift.git`, choose `main` branch (or a specific version), add to your app target.
+`File` → `Add Package Dependencies…` → enter `https://github.com/Jasonvdb/pubky-pulse-swift.git`, choose `main` branch (or a specific version), add to your app target.
 
 ## Quickstart
 
@@ -179,7 +179,7 @@ Unit tests run self-contained:
 swift test --skip SDKIntegrationTests --skip AppleSearchAdsAttributionTests
 ```
 
-Integration tests need a Pubky Pulse server on `http://127.0.0.1:4111` with the seeded test database, so they are not part of CI. See the [main repo](https://github.com/pubky/pubky-pulse) for running the server locally; then:
+Integration tests need a Pubky Pulse server on `http://127.0.0.1:4111` with the seeded test database, so they are not part of CI. See the [main repo](https://github.com/Jasonvdb/pubky-pulse) for running the server locally; then:
 
 ```bash
 PULSE_TEST_ENDPOINT=http://127.0.0.1:4111 \
@@ -188,7 +188,7 @@ PULSE_TEST_ENDPOINT=http://127.0.0.1:4111 \
 
 ## Related repos
 
-- **[pubky/pubky-pulse](https://github.com/pubky/pubky-pulse)** — server, dashboard, MCP endpoint, documentation.
+- **[Jasonvdb/pubky-pulse](https://github.com/Jasonvdb/pubky-pulse)** — server, dashboard, MCP endpoint, documentation.
 - **[Jasonvdb/pubky-pulse-node](https://github.com/Jasonvdb/pubky-pulse-node)** — Node.js server SDK.
 - **[Jasonvdb/pubky-pulse-web](https://github.com/Jasonvdb/pubky-pulse-web)** — browser SDK.
 
