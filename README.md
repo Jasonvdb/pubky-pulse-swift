@@ -7,9 +7,9 @@
 
 Native Swift SDK for iOS, iPadOS, macOS, and watchOS — event logging, structured metrics, funnels, identity, screen tracking, drop-in feedback and questionnaire views, and Apple Search Ads attribution capture. Zero external runtime dependencies.
 
-Part of the [Pubky Pulse](https://pulse.pubky.org) self-hosted metrics platform.
+Part of the [Pubky Pulse](https://pubkypulse.com) self-hosted metrics platform.
 
-**Full setup guide & API reference: [pulse.pubky.org/docs/sdks/swift](https://pulse.pubky.org/docs/sdks/swift)**
+**Full setup guide & API reference: [pubkypulse.com/docs/sdks/swift](https://pubkypulse.com/docs/sdks/swift)**
 
 ## Install
 
@@ -34,15 +34,14 @@ Add `PubkyPulse` to your target's `dependencies`.
 ```swift
 import PubkyPulse
 
-try Pulse.configure(
-    endpoint: "https://ingest.pulse.pubky.org",
-    apiKey: "pulse_client_..."
-)
+try Pulse.configure(apiKey: "pulse_client_...")
 
 Pulse.info("app_launched")
 ```
 
 Call `configure` once at app launch (e.g. from your `App` init). It throws on invalid input.
+
+Omitting `endpoint` sends events to `https://ingest.pubkypulse.com`, Pubky's hosted ingest host. The fallback is silent, so self-hosters must pass their own ingest host as `endpoint:`.
 
 ## Examples
 
@@ -119,7 +118,7 @@ For programmatic submission (e.g., forwarding feedback from your own form):
 let receipt = try await Pulse.sendFeedback(message: "Love the new update!", email: "me@example.com")
 ```
 
-Every label, placeholder, and error message is overridable via `PulseFeedbackStrings`. See [User Feedback](https://pulse.pubky.org/docs/sdks/swift/feedback) for presentation modes, localization, and submission lifecycle.
+Every label, placeholder, and error message is overridable via `PulseFeedbackStrings`. See [User Feedback](https://pubkypulse.com/docs/sdks/swift/feedback) for presentation modes, localization, and submission lifecycle.
 
 ### Ask a questionnaire
 
@@ -128,7 +127,7 @@ ContentView()
     .pulseQuestionnaire(slug: "post-onboarding", trigger: .afterLaunches(3))
 ```
 
-The questionnaire is authored on the server (dashboard or MCP) and only appears when the trigger conditions hold and the user hasn't already responded. See [Questionnaires](https://pulse.pubky.org/docs/sdks/swift/questionnaires).
+The questionnaire is authored on the server (dashboard or MCP) and only appears when the trigger conditions hold and the user hasn't already responded. See [Questionnaires](https://pubkypulse.com/docs/sdks/swift/questionnaires).
 
 ### Apple Search Ads attribution
 
@@ -136,7 +135,6 @@ Attribution is auto-captured on `Pulse.configure()` — no extra code needed. To
 
 ```swift
 try Pulse.configure(
-    endpoint: "https://ingest.pulse.pubky.org",
     apiKey: "pulse_client_...",
     attributionEnabled: false
 )
@@ -146,7 +144,7 @@ Each capture attempt emits an `sdk:attribution_capture` event, so the capture �
 
 ### Apple Watch
 
-`Pulse` works unchanged on watchOS. Events fall back from direct HTTP to `WCSession.transferUserInfo` to an on-disk queue, so a watch that's off-network still delivers once it reaches its iPhone — forward the payload with `Pulse.handleWatchUserInfo(_:)` from your iPhone app's `WCSessionDelegate`. See [Apple Watch](https://pulse.pubky.org/docs/sdks/swift/watchos).
+`Pulse` works unchanged on watchOS. Events fall back from direct HTTP to `WCSession.transferUserInfo` to an on-disk queue, so a watch that's off-network still delivers once it reaches its iPhone — forward the payload with `Pulse.handleWatchUserInfo(_:)` from your iPhone app's `WCSessionDelegate`. See [Apple Watch](https://pubkypulse.com/docs/sdks/swift/watchos).
 
 ## Privacy
 
@@ -154,7 +152,7 @@ The SDK ships an Apple-compliant `PrivacyInfo.xcprivacy` manifest. SPM merges it
 
 On your **next** App Store submission, tick these categories under **App Store Connect → App Privacy**: Crash Data, Other Diagnostic Data, Product Interaction, Performance Data, Other User Content, and (if you call `Pulse.setUser`) User ID. Subsequent submissions are unchanged.
 
-Full guide: [Privacy & App Store compliance](https://pulse.pubky.org/docs/sdks/swift/privacy-compliance).
+Full guide: [Privacy & App Store compliance](https://pubkypulse.com/docs/sdks/swift/privacy-compliance).
 
 ## Example app
 
