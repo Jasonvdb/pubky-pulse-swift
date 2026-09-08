@@ -41,9 +41,12 @@ Pulse.info("app_launched")
 
 Call `configure` once at app launch (e.g. from your `App` init). It throws on invalid input.
 
-The client key identifies the app. The SDK includes the bundle identifier as
-optional metadata when available; an absent identifier never prevents setup.
-On watchOS, companion apps retain the iPhone bundle identifier as this metadata.
+The client key identifies the app. The SDK automatically sends the bundle identifier
+when available. For a key belonging to an Apple or Android app, the server rejects
+a supplied identifier that differs from the registered one, catching wrong-key
+configuration. An absent identifier never prevents setup and is accepted by updated
+servers; keys belonging to web or backend apps skip identifier validation.
+On watchOS, companion apps retain the iPhone bundle identifier.
 Servers must support client-key-only requests before using the SDK in a process
 without a bundle identifier.
 

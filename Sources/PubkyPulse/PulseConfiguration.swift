@@ -42,9 +42,9 @@ public struct PulseConfiguration: Sendable {
 
     /// On watchOS, prefer the iOS counterpart's bundle ID (via
     /// `WKCompanionAppBundleIdentifier` in Info.plist) to preserve the existing
-    /// companion metadata. Falls back to the watch's own bundle ID for
-    /// standalone watch apps. The client key, not this optional metadata,
-    /// determines which app receives requests.
+    /// companion identifier. Falls back to the watch's own bundle ID for
+    /// standalone watch apps. The client key determines which app receives
+    /// requests; the server checks supplied identifiers for native app keys.
     private static func resolveBundleId() -> String? {
         #if os(watchOS)
         if let companion = Bundle.main.object(forInfoDictionaryKey: "WKCompanionAppBundleIdentifier") as? String,
