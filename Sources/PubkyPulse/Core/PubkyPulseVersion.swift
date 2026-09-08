@@ -6,5 +6,5 @@ public enum PubkyPulseVersion {
     /// SDK identifier sent on every event as `sdk_name`.
     public static let name = "pubky-pulse-swift"
     /// Semantic version of this SDK build, sent on every event as `sdk_version`.
-    public static let current = "0.0.0"
+    public static let current = "0.1.0"
 }
