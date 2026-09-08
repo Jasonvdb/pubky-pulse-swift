@@ -12,8 +12,15 @@ public struct PulseConfiguration: Sendable {
 
     private static let clientKeyPrefix = "pulse_client_"
 
+    /// Pubky's own hosted ingest host, used when the caller omits `endpoint`.
+    ///
+    /// The fallback is silent — nothing is logged, warned, or thrown when it is
+    /// taken — so a self-hoster must pass their own ingest host explicitly, or
+    /// their data silently goes to Pubky's instance instead of theirs.
+    public static let defaultEndpoint = "https://ingest.pubkypulse.com"
+
     public init(
-        endpoint: String,
+        endpoint: String = Self.defaultEndpoint,
         apiKey: String,
         flushOnBackground: Bool = true,
         compressionEnabled: Bool = true,
@@ -54,7 +61,7 @@ public struct PulseConfiguration: Sendable {
 
     /// Internal initializer for testing with an explicit bundle ID.
     init(
-        endpoint: String,
+        endpoint: String = Self.defaultEndpoint,
         apiKey: String,
         bundleId: String,
         flushOnBackground: Bool = true,
@@ -63,6 +70,12 @@ public struct PulseConfiguration: Sendable {
         consoleLogging: Bool = true,
         attributionEnabled: Bool = true
     ) throws {
+        // Only an absent `endpoint` falls back to `defaultEndpoint`. An
+        // explicitly supplied empty or malformed value still throws:
+        // an explicitly empty one is almost always an environment variable that
+        // failed to load, and silently redirecting that traffic to Pubky's
+        // hosted instance would send a self-hoster's data to the wrong company.
+        // `URL(string: "")` is nil, so the existing guard already rejects it.
         guard let url = URL(string: endpoint) else {
             throw PulseConfigurationError.invalidEndpoint(endpoint)
         }

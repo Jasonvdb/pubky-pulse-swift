@@ -15,6 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # The bracketed regex keeps this step from matching its own source line,
+      # so the workflow file itself stays covered by the sweep. Case-insensitive
+      # because the stale domain also appeared capitalised in prose.
+      - name: Stale domain guard
+        run: |
+          if grep -rniI "pulse[.]pubky[.]org" \
+            --exclude-dir=.git --exclude-dir=.build .; then
+            echo "::error::Stale domain reintroduced above; use pubkypulse.com."
+            exit 1
+          fi
+
       - name: Show Swift version
         run: swift --version
 
