@@ -140,12 +140,22 @@ jobs:
           # finds the same tag and skips again — and no run ever goes red.
           # Versions simply stop advancing and nothing says so.
           #
-          # So only count the tag when it is THIS release's tag: the commit it
-          # points at must carry the computed version in its version constant,
-          # which is what the bump commit a genuine rerun looks at does. Any
-          # unrelated tag leaves the guard false, and the atomic push below then
-          # fails loudly because the tag already exists — a visible error a human
-          # can act on. Do not simplify this back to bare tag existence.
+          # So only count the tag when it is THIS release's tag, which takes
+          # two things. The commit it points at must carry the computed version
+          # in its version constant, which is what the bump commit a genuine
+          # rerun looks at does. That on its own is still not enough: a version
+          # number is not unique to a commit, and this repository's pre-rename
+          # history is full of commits whose constant reads the very version the
+          # next release computes, so a stray tag on one of them would satisfy a
+          # version-only check and wedge the pipeline exactly as above. The
+          # tagged commit must therefore also belong to THIS run: a genuine
+          # rerun's bump commit was created directly on top of the checked-out
+          # SHA, so its FIRST PARENT is the triggering commit — something no
+          # unrelated historical tag can fake. Any other tag leaves the guard
+          # false, and the atomic push below then fails loudly because the tag
+          # already exists — a visible error a human can act on. Do not simplify
+          # this back to bare tag existence, nor to the version match without
+          # the first-parent check.
           already_released=false
           tag_ref=""
           if git rev-parse -q --verify "refs/tags/$next" >/dev/null; then
@@ -162,10 +172,23 @@ jobs:
             # as empty here rather than failing the step.
             tagged_source=$(git show "$tag_ref^{commit}:$VERSION_FILE" 2>/dev/null || true)
             tagged_version=$(printf '%s\n' "$tagged_source" | extract_version)
-            if [[ "$tagged_version" == "$version" ]]; then
+            # A root commit has no first parent, which reads as empty here
+            # rather than failing the step.
+            tagged_parent=$(git rev-parse -q --verify "$tag_ref^{commit}^" 2>/dev/null || true)
+            if [[ "$tagged_version" == "$version" && "$tagged_parent" == "${{ github.sha }}" ]]; then
               already_released=true
             else
-              echo "::warning::Tag $next already exists but the version constant at that tag says '${tagged_version:-<none>}', not $version, so it is not this release. Not skipping the release steps; the tag push will fail loudly if that tag is in the way."
+              reason=""
+              if [[ "$tagged_version" != "$version" ]]; then
+                reason="the version constant at that tag says '${tagged_version:-<none>}', not $version"
+              fi
+              if [[ "$tagged_parent" != "${{ github.sha }}" ]]; then
+                if [[ -n "$reason" ]]; then
+                  reason="$reason, and "
+                fi
+                reason="${reason}the tagged commit is not a child of this run's commit ${{ github.sha }} (its first parent is '${tagged_parent:-<none>}')"
+              fi
+              echo "::warning::Tag $next already exists but $reason, so it is not this release. Not skipping the release steps; the tag push will fail loudly if that tag is in the way."
             fi
           fi
 
