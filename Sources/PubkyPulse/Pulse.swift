@@ -41,7 +41,7 @@ public enum Pulse {
     // MARK: - Setup
 
     public static func configure(
-        endpoint: String,
+        endpoint: String = PulseConfiguration.defaultEndpoint,
         apiKey: String,
         flushOnBackground: Bool = true,
         compressionEnabled: Bool = true,
@@ -55,7 +55,7 @@ public enum Pulse {
 
     /// Internal entry point for testing with an explicit bundle ID.
     static func configure(
-        endpoint: String,
+        endpoint: String = PulseConfiguration.defaultEndpoint,
         apiKey: String,
         bundleId: String,
         flushOnBackground: Bool = true,
