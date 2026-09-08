@@ -14,6 +14,77 @@ final class EventTransportTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDir)
     }
 
+    func testBundleMetadataAcrossAllRequestPaths() async throws {
+        for suppliedBundleId in [nil, "", "org.pubky.test&extra=value"] as [String?] {
+            let configuration = try PulseConfiguration(apiKey: "pulse_client_test123", bundleId: suppliedBundleId)
+            let bundleId = configuration.bundleId
+            var receivedPaths: [String] = []
+            MockURLProtocol.handler = { request in
+                let url = request.url!
+                receivedPaths.append(url.path)
+                XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer pulse_client_test123")
+                if request.httpMethod == "GET" {
+                    let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+                    XCTAssertEqual(items.first(where: { $0.name == "bundle_id" })?.value, bundleId)
+                    XCTAssertEqual(items.first(where: { $0.name == "user_id" })?.value, "user&name=value")
+                    XCTAssertEqual(items.first(where: { $0.name == "force" })?.value, "true")
+                    XCTAssertEqual(items.count, bundleId == nil ? 2 : 3)
+                } else {
+                    let data = request.httpBody ?? request.httpBodyStream.flatMap { stream in
+                        stream.open()
+                        defer { stream.close() }
+                        return Data(reading: stream)
+                    }
+                    let json = data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+                    XCTAssertNotNil(json)
+                    if let bundleId {
+                        XCTAssertEqual(json?["bundle_id"] as? String, bundleId)
+                    } else {
+                        // Also rejects explicit null and empty-string fields.
+                        XCTAssertNil(json?["bundle_id"])
+                    }
+                }
+                let body: String
+                switch url.path {
+                case "/v1/ingest": body = #"{"accepted":1,"rejected":0}"#
+                case "/v1/questionnaires/test": body = #"{"eligible":false,"reason":"inactive"}"#
+                case "/v1/questionnaires/dismiss": body = #"{"dismissed_at":"2026-09-08T00:00:00Z"}"#
+                default: body = #"{"id":"receipt","created_at":"2026-09-08T00:00:00Z","was_submitted":true}"#
+                }
+                return (HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+            }
+            let transport = makeTransport(bundleId: bundleId)
+            await transport.enqueue(LogEvent.stub(message: "hello"))
+            await transport.flush()
+            _ = try await transport.fetchQuestionnaire(slug: "test", userId: "user&name=value", force: true).get()
+            _ = try await transport.saveQuestionnaireResponse(
+                slug: "test", userId: "user", sessionId: nil, answers: [:], isComplete: true,
+                deviceInfo: nil, environment: nil, appVersion: nil, isDev: true
+            ).get()
+            _ = try await transport.submitQuestionnaireDismiss(userId: "user").get()
+            _ = try await transport.submitFeedback(FeedbackRequestBody(
+                bundle_id: bundleId, message: "feedback", session_id: nil, user_id: nil,
+                submitter_name: nil, submitter_email: nil, app_version: nil, sdk_name: nil,
+                sdk_version: nil, environment: nil, device_model: nil, os_version: nil, is_dev: true
+            )).get()
+            XCTAssertEqual(receivedPaths, [
+                "/v1/ingest", "/v1/questionnaires/test", "/v1/questionnaires/test/responses",
+                "/v1/questionnaires/dismiss", "/v1/feedback"
+            ])
+        }
+    }
+
+    func testQuestionnaireWithoutMetadataOrOptionsHasNoQuery() async throws {
+        var receivedURL: URL?
+        MockURLProtocol.handler = { request in
+            receivedURL = request.url
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+            return (response, Data(#"{"eligible":false,"reason":"inactive"}"#.utf8))
+        }
+        _ = try await makeTransport(bundleId: nil).fetchQuestionnaire(slug: "test", userId: nil).get()
+        XCTAssertEqual(receivedURL?.absoluteString, "https://api.test.com/v1/questionnaires/test")
+    }
+
     func testFlushSendsEventsToServer() async {
         var receivedBody: Data?
         MockURLProtocol.handler = { request in
@@ -226,7 +297,7 @@ final class EventTransportTests: XCTestCase {
         }
     }
 
-    private func makeTransport(offlineQueue: OfflineQueue? = nil) -> EventTransport {
+    private func makeTransport(offlineQueue: OfflineQueue? = nil, bundleId: String? = "org.pubky.pulse.test") -> EventTransport {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [MockURLProtocol.self]
         let session = URLSession(configuration: config)
@@ -234,7 +305,7 @@ final class EventTransportTests: XCTestCase {
         return EventTransport(
             endpoint: URL(string: "https://api.test.com")!,
             apiKey: "pulse_client_test123",
-            bundleId: "org.pubky.pulse.test",
+            bundleId: bundleId,
             compressionEnabled: true,
             offlineQueue: offlineQueue ?? OfflineQueue(directory: tempDir),
             networkMonitor: NetworkMonitor(),

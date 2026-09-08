@@ -464,7 +464,7 @@ extension AnyAnswerJSON: Decodable {
 }
 
 struct QuestionnaireSubmitRequestBody: Encodable {
-    let bundle_id: String
+    let bundle_id: String?
     let session_id: String?
     let user_id: String?
     let answers: PulseQuestionnaireAnswersWire
@@ -489,7 +489,7 @@ struct QuestionnaireSubmitResponseBody: Decodable {
 }
 
 struct QuestionnaireDismissRequestBody: Encodable {
-    let bundle_id: String
+    let bundle_id: String?
     let user_id: String
 }
 

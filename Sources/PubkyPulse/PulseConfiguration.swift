@@ -3,7 +3,7 @@ import Foundation
 public struct PulseConfiguration: Sendable {
     let endpoint: URL
     let apiKey: String
-    let bundleId: String
+    let bundleId: String?
     let flushOnBackground: Bool
     let compressionEnabled: Bool
     let networkTrackingEnabled: Bool
@@ -28,13 +28,10 @@ public struct PulseConfiguration: Sendable {
         consoleLogging: Bool = true,
         attributionEnabled: Bool = true
     ) throws {
-        guard let bundleId = Self.resolveBundleId(), !bundleId.isEmpty else {
-            throw PulseConfigurationError.missingBundleId
-        }
         try self.init(
             endpoint: endpoint,
             apiKey: apiKey,
-            bundleId: bundleId,
+            bundleId: Self.resolveBundleId(),
             flushOnBackground: flushOnBackground,
             compressionEnabled: compressionEnabled,
             networkTrackingEnabled: networkTrackingEnabled,
@@ -44,11 +41,10 @@ public struct PulseConfiguration: Sendable {
     }
 
     /// On watchOS, prefer the iOS counterpart's bundle ID (via
-    /// `WKCompanionAppBundleIdentifier` in Info.plist) so events from the
-    /// watch ingest under the same registered app as the iPhone, and direct
-    /// HTTP from cellular watches doesn't 403 on bundle_id mismatch. Falls
-    /// back to the watch's own bundle ID for standalone watch apps with no
-    /// iOS counterpart.
+    /// `WKCompanionAppBundleIdentifier` in Info.plist) to preserve the existing
+    /// companion metadata. Falls back to the watch's own bundle ID for
+    /// standalone watch apps. The client key, not this optional metadata,
+    /// determines which app receives requests.
     private static func resolveBundleId() -> String? {
         #if os(watchOS)
         if let companion = Bundle.main.object(forInfoDictionaryKey: "WKCompanionAppBundleIdentifier") as? String,
@@ -63,7 +59,7 @@ public struct PulseConfiguration: Sendable {
     init(
         endpoint: String = Self.defaultEndpoint,
         apiKey: String,
-        bundleId: String,
+        bundleId: String?,
         flushOnBackground: Bool = true,
         compressionEnabled: Bool = true,
         networkTrackingEnabled: Bool = true,
@@ -82,12 +78,9 @@ public struct PulseConfiguration: Sendable {
         guard apiKey.hasPrefix(Self.clientKeyPrefix) else {
             throw PulseConfigurationError.invalidApiKey("API key must start with \"\(Self.clientKeyPrefix)\"")
         }
-        guard !bundleId.isEmpty else {
-            throw PulseConfigurationError.missingBundleId
-        }
         self.endpoint = url
         self.apiKey = apiKey
-        self.bundleId = bundleId
+        self.bundleId = bundleId.flatMap { $0.isEmpty ? nil : $0 }
         self.flushOnBackground = flushOnBackground
         self.compressionEnabled = compressionEnabled
         self.networkTrackingEnabled = networkTrackingEnabled
@@ -99,6 +92,7 @@ public struct PulseConfiguration: Sendable {
 public enum PulseConfigurationError: LocalizedError {
     case invalidEndpoint(String)
     case invalidApiKey(String)
+    /// Retained for source compatibility; missing bundle metadata no longer throws.
     case missingBundleId
 
     public var errorDescription: String? {

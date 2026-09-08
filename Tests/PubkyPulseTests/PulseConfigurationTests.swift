@@ -5,6 +5,30 @@ import XCTest
 /// ingest host, while an explicitly supplied value — including an empty one —
 /// is still taken at face value.
 final class PulseConfigurationTests: XCTestCase {
+    func testClientKeyOnlyConfigurationSucceeds() throws {
+        _ = try PulseConfiguration(apiKey: "pulse_client_test123")
+    }
+
+    func testBundleMetadataIsBestEffort() throws {
+        for bundleId in [nil, "", "com.example.app"] as [String?] {
+            let config = try PulseConfiguration(apiKey: "pulse_client_test123", bundleId: bundleId)
+            XCTAssertEqual(config.bundleId, bundleId == "" ? nil : bundleId)
+        }
+    }
+
+    func testMissingBundleMetadataDoesNotBypassValidation() {
+        XCTAssertThrowsError(try PulseConfiguration(apiKey: "invalid", bundleId: nil)) { error in
+            guard case PulseConfigurationError.invalidApiKey = error else {
+                return XCTFail("Expected invalidApiKey, got \(error)")
+            }
+        }
+        XCTAssertThrowsError(try PulseConfiguration(endpoint: "", apiKey: "pulse_client_test123", bundleId: nil)) { error in
+            guard case PulseConfigurationError.invalidEndpoint = error else {
+                return XCTFail("Expected invalidEndpoint, got \(error)")
+            }
+        }
+    }
+
     func testOmittedEndpointFallsBackToHostedIngest() throws {
         let config = try PulseConfiguration(apiKey: "pulse_client_test123", bundleId: "com.example.app")
         XCTAssertEqual(config.endpoint.scheme, "https")

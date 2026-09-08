@@ -57,7 +57,7 @@ public enum Pulse {
     static func configure(
         endpoint: String = PulseConfiguration.defaultEndpoint,
         apiKey: String,
-        bundleId: String,
+        bundleId: String?,
         flushOnBackground: Bool = true,
         compressionEnabled: Bool = true,
         networkTrackingEnabled: Bool = true,
@@ -452,7 +452,7 @@ public enum Pulse {
         let trimmed = message.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { throw PulseFeedbackError.emptyMessage }
 
-        let snapshot = state.withLock { s -> (EventTransport, String, DeviceInfo, String?, String?)? in
+        let snapshot = state.withLock { s -> (EventTransport, String?, DeviceInfo, String?, String?)? in
             guard let transport = s.transport,
                   let config = s.configuration,
                   let deviceInfo = s.deviceInfo else {

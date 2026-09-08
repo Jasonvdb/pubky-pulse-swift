@@ -3,7 +3,7 @@ import Foundation
 /// Wire format sent to `POST /v1/feedback`. Internal — public callers go
 /// through `Pulse.sendFeedback(...)`.
 struct FeedbackRequestBody: Codable, Sendable {
-    let bundle_id: String
+    let bundle_id: String?
     let message: String
     let session_id: String?
     let user_id: String?

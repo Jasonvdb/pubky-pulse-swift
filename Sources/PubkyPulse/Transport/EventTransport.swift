@@ -10,7 +10,7 @@ actor EventTransport {
     private let feedbackURL: URL
     private let questionnaireDismissURL: URL
     private let apiKey: String
-    private let bundleId: String
+    private let bundleId: String?
     private let session: URLSession
     private let offlineQueue: OfflineQueue
     private let networkMonitor: NetworkMonitor
@@ -54,7 +54,7 @@ actor EventTransport {
     init(
         endpoint: URL,
         apiKey: String,
-        bundleId: String,
+        bundleId: String?,
         compressionEnabled: Bool,
         offlineQueue: OfflineQueue,
         networkMonitor: NetworkMonitor,
@@ -389,10 +389,11 @@ actor EventTransport {
     /// Throws only for slug-not-found (404) and transport failures.
     func fetchQuestionnaire(slug: String, userId: String?, force: Bool = false) async -> Result<PulseQuestionnaireFetchResult, PulseQuestionnaireError> {
         var components = URLComponents(url: questionnaireURL(slug: slug), resolvingAgainstBaseURL: false)
-        var items: [URLQueryItem] = [URLQueryItem(name: "bundle_id", value: bundleId)]
+        var items: [URLQueryItem] = []
+        if let bundleId { items.append(URLQueryItem(name: "bundle_id", value: bundleId)) }
         if let userId { items.append(URLQueryItem(name: "user_id", value: userId)) }
         if force { items.append(URLQueryItem(name: "force", value: "true")) }
-        components?.queryItems = items
+        components?.queryItems = items.isEmpty ? nil : items
         guard let url = components?.url else {
             return .failure(.transportFailure("invalid URL"))
         }

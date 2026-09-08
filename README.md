@@ -41,6 +41,12 @@ Pulse.info("app_launched")
 
 Call `configure` once at app launch (e.g. from your `App` init). It throws on invalid input.
 
+The client key identifies the app. The SDK includes the bundle identifier as
+optional metadata when available; an absent identifier never prevents setup.
+On watchOS, companion apps retain the iPhone bundle identifier as this metadata.
+Servers must support client-key-only requests before using the SDK in a process
+without a bundle identifier.
+
 Omitting `endpoint` sends events to `https://ingest.pubkypulse.com`, Pubky's hosted ingest host. The fallback is silent, so self-hosters must pass their own ingest host as `endpoint:`.
 
 ## Examples
